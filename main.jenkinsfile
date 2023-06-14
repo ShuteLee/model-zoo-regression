@@ -34,7 +34,19 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     sh """#!/bin/bash
-                        pwd
+                        set -e
+                        rm -rf *
+                        if [ -d "/git-repository/model-zoo" ]; then
+                            pushd /git-repository/model-zoo && git pull & popd
+                        else
+                            git clone https://github.com/sophgo/model-zoo.git
+                        fi
+                        git clone /git-repository/model-zoo
+                        ls
+                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir
+                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/libsophon
+                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/bm_prebuilt_toolchains
+                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/nntoolchain
                     """
                 }
             }

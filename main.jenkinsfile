@@ -27,8 +27,8 @@ pipeline {
     stages {
         stage('Information') {
             steps {
-                echo "case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}\n"
                 source utils.sh
+                echo "case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}\n"
             }
         }
         stage('Checkout') {

@@ -74,7 +74,7 @@ pipeline {
                             sync_repository_gerrit("tpu-mlir")
                             sh """#!/bin/bash
                                 set -e
-                                cp -v ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
+                                cp -rv ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
                             """
                         }
                     }

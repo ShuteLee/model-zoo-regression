@@ -40,7 +40,7 @@ def sync_repostory(name, url) {
 pipeline {
     parameters {
         string(name: 'CASE_NAME', defaultValue: '', description: 'Models should be rechecked under this version.')
-        string(name: 'TOOLCHAIN', defaultValue: '', description: 'NNTC/TPU-MLIR')
+        string(name: 'TOOLCHAIN', defaultValue: '', description: 'nntoolchain/tpu-mlir')
         string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR/NNTC .')
     }
@@ -60,7 +60,7 @@ pipeline {
                 dir("$WORKSPACE") {
                     sync_repository_github("model-zoo")
                     script {
-                        if (params.TOOLCHAIN == "NNTC") {
+                        if (params.TOOLCHAIN == "nntoolchain") {
                             sync_repository_gerrit("libsophon")
                             sync_repository_gerrit("bm_prebuilt_toolchains")
                             sync_repository_gerrit("nntoolchain")
@@ -70,7 +70,7 @@ pipeline {
                                 ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
                                 cp -v ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
                             """
-                        } else if (params.TOOLCHAIN == "TPU-MLIR") {
+                        } else if (params.TOOLCHAIN == "tpu-mlir") {
                             sync_repository_gerrit("tpu-mlir")
                             sh """#!/bin/bash
                                 set -e

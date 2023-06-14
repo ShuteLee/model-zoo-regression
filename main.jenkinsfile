@@ -17,16 +17,8 @@ def generateStage(model) {
 }
 
 def sync_repostory(name, url) {
-    return {
-        stage("sync_${name}") {
-            dir("$GIT_REPOSTORY_PATH") {
-                sh """#!/bin/bash
-                    set -e
-                    echo "hello======================="
-                    """
-            }
-        }
-    }
+    println("name: " + name);
+    println("url: " + url);
 }
 
 pipeline {

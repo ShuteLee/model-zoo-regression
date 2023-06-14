@@ -23,7 +23,7 @@ def sync_repostory(name, url) {
         println("repostory path ${GIT_REPOSTORY_PATH} exists.")
     } else {
         println("repostory path ${GIT_REPOSTORY_PATH} does not exist, creating...")
-        repPath.mkdirs()
+        sh "mkdir -p ${GIT_REPOSTORY_PATH}"
     }
     def path = "${GIT_REPOSTORY_PATH}/" + name
     if (fileExists(path)) {

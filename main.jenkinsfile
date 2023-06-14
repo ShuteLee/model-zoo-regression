@@ -98,8 +98,10 @@ pipeline {
         stage('CaseSplit') {
             steps {
                 dir("$WORKSPACE") {
-                    for (def case_name : params.CASE_NAME.split()) {
-                        println(case_name)
+                    script {
+                        for (def case_name : params.CASE_NAME.split()) {
+                            println(case_name)
+                        }
                     }
                 }
             }

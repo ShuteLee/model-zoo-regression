@@ -62,6 +62,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     sync_repostory("model-zoo", "https://github.com/sophgo/model-zoo.git")
+                    sync_repostory("tpu-mlir", "ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir")
                 }
             }
         }

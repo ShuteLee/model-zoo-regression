@@ -36,6 +36,7 @@ pipeline {
                     sh """#!/bin/bash
                         set -e
                         rm -rf *
+                        mkdir -p /var/jenkins_home/git-repository
                         if [ -d "/var/jenkins_home/git-repository/model-zoo" ]; then
                             pushd /var/jenkins_home/git-repository/model-zoo && git pull & popd
                         else

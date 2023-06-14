@@ -21,12 +21,7 @@ def sync_repostory(name, url) {
         stage("sync_${name}") {
             dir("$GIT_REPOSTORY_PATH") {
                 sh """#!/bin/bash
-                    mkdir -p $GIT_REPOSTORY_PATH
-                    pushd $GIT_REPOSTORY_PATH
-                    echo ${name}
-                    echo ${GIT_REPOSTORY_PATH}
-                    echo ${url}
-                    pwd
+                    echo "hello======================="
                     """
             }
         }
@@ -53,15 +48,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        rm -rf *
-                        mkdir -p /var/jenkins_home/git-repository
-                        echo "===================================================1============================================"
-                        sync_repostory("model-zoo", "https://github.com/sophgo/model-zoo.git")
-                        echo "===================================================2============================================"
-                        ls
-                    """
+                    sync_repostory("model-zoo", "https://github.com/sophgo/model-zoo.git")
                 }
             }
         }

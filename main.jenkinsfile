@@ -36,12 +36,12 @@ pipeline {
                     sh """#!/bin/bash
                         set -e
                         rm -rf *
-                        if [ -d "/git-repository/model-zoo" ]; then
-                            pushd /git-repository/model-zoo && git pull & popd
+                        if [ -d "/var/jenkins_home/git-repository/model-zoo" ]; then
+                            pushd /var/jenkins_home/git-repository/model-zoo && git pull & popd
                         else
                             git clone https://github.com/sophgo/model-zoo.git
                         fi
-                        git clone /git-repository/model-zoo
+                        git clone /var/jenkins_home/git-repository/model-zoo
                         ls
                         #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir
                         #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/libsophon

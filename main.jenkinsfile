@@ -17,13 +17,15 @@ def generateStage(model) {
 }
 
 def sync_repository_github(name, url) {
+    def url = "https://github.com/sophgo/${name}.git"
+    println(url)
     sync_repostory(name, url)
 }
 
 def sync_repository_gerrit(name) {
-    def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PWD}@gerrit-ai.sophgo.vip:8443/a/${name}"
+    def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PSW}@gerrit-ai.sophgo.vip:8443/a/${name}"
     println(url)
-    sync_repostory(name, url.toString())
+    sync_repostory(name, url)
 }
 
 def sync_repostory(name, url) {
@@ -73,7 +75,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 dir("$WORKSPACE") {
-                    sync_repository_github("model-zoo", "https://github.com/sophgo/model-zoo.git")
+                    sync_repository_github("model-zoo")
                     sync_repository_gerrit("tpu-mlir")
                 }
             }

@@ -1,0 +1,43 @@
+//===-*- Groovy -*-===
+
+def generateStage(model) {
+    return {
+        stage("${model}") {
+                dir("$WORKSPACE") {
+                    sh """#!/bin/bash
+                        set -e
+                        cd tpu-mlir/
+                        source ./envsetup.sh
+                        cd regression
+                        ./run_model.sh ${model}
+                        """
+            }
+        }
+    }
+}
+
+pipeline {
+    parameters {
+        string(name: 'CASE_NAME', defaultValue: '', description: 'Models should be rechecked under this version.')
+        string(name: 'TOOLCHAIN', defaultValue: '', description: 'NNTC/TPU-MLIR')
+        string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
+        string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR/NNTC .')
+    }
+    agent any
+    stages {
+        stage('Information') {
+            steps {
+                echo "case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}\n"
+            }
+        }
+        stage('Checkout') {
+            steps {
+                dir("$WORKSPACE") {
+                    sh """#!/bin/bash
+                        pwd
+                    """
+                }
+            }
+        }
+    }
+}

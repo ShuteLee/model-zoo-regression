@@ -27,13 +27,6 @@ def sync_repostory(name, url) {
                     echo ${GIT_REPOSTORY_PATH}
                     echo ${url}
                     pwd
-                    if [ -d $name ]; then
-                        pushd $name && git pull & git submodule update & popd
-                    else
-                        git clone $url
-                    fi
-                    popd
-                    git clone $GIT_REPOSTORY_PATH/$name
                     """
             }
         }

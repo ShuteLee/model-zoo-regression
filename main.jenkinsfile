@@ -22,7 +22,8 @@ def sync_repository_github(name, url) {
 
 def sync_repository_gerrit(name) {
     def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PWD}@gerrit-ai.sophgo.vip:8443/a/${name}"
-    sync_repostory(name, url)
+    println(url)
+    sync_repostory(name, url.toString())
 }
 
 def sync_repostory(name, url) {

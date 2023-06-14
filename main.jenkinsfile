@@ -27,8 +27,7 @@ pipeline {
     stages {
         stage('Information') {
             steps {
-                chmod 777 utils.sh
-                source utils.sh
+                source ./utils.sh
                 echo "case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}\n"
             }
         }

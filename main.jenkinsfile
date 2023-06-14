@@ -43,10 +43,6 @@ pipeline {
                         echo "===================================================2============================================"
                         sync_repostory "tpu-mlir" "ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir"
                         ls
-                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir
-                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/libsophon
-                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/bm_prebuilt_toolchains
-                        #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/nntoolchain
                     """
                 }
             }

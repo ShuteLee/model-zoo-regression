@@ -23,6 +23,10 @@ def sync_repostory(name, url) {
                 sh """#!/bin/bash
                     mkdir -p $GIT_REPOSTORY_PATH
                     pushd $GIT_REPOSTORY_PATH
+                    echo ${name}
+                    echo ${GIT_REPOSTORY_PATH}
+                    echo ${url}
+                    pwd
                     if [ -d $name ]; then
                         pushd $name && git pull & git submodule update & popd
                     else

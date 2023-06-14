@@ -28,6 +28,7 @@ pipeline {
         stage('Information') {
             steps {
                 echo "case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}\n"
+                source utils.sh
             }
         }
         stage('Checkout') {
@@ -36,15 +37,8 @@ pipeline {
                     sh """#!/bin/bash
                         set -e
                         rm -rf *
-                        mkdir -p /var/jenkins_home/git-repository
-                        pushd /var/jenkins_home/git-repository
-                        if [ -d "model-zoo" ]; then
-                            pushd model-zoo && git pull & popd
-                        else
-                            git clone https://github.com/sophgo/model-zoo.git
-                        fi
-                        popd
-                        git clone /var/jenkins_home/git-repository/model-zoo
+                        sync_repostory model-zoo https://github.com/sophgo/model-zoo.git
+                        sync_repostory tpu-mlir ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir
                         ls
                         #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir
                         #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/libsophon

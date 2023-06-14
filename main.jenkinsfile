@@ -37,7 +37,9 @@ pipeline {
                     sh """#!/bin/bash
                         set -e
                         rm -rf *
+                        echo ===================================================1============================================
                         sync_repostory model-zoo https://github.com/sophgo/model-zoo.git
+                        echo ===================================================2============================================
                         sync_repostory tpu-mlir ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir
                         ls
                         #git clone ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir

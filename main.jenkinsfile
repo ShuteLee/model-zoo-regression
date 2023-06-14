@@ -75,22 +75,24 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     sync_repository_github("model-zoo")
-                    if (params.TOOLCHAIN == "NNTC") {
-                        sync_repository_gerrit("libsophon")
-                        sync_repository_gerrit("bm_prebuilt_toolchains")
-                        sync_repository_gerrit("nntoolchain")
-                        sh """#!/bin/bash
-                            set -e
-                            ln -s ${GIT_REPOSTORY_PATH}/libsophon ${WORKSPACE}/libsophon
-                            ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
-                            cp -v ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
-                        """
-                    } else if (params.TOOLCHAIN == "TPU-MLIR") {
-                        sync_repository_gerrit("tpu-mlir")
-                        sh """#!/bin/bash
-                            set -e
-                            cp -v ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
-                        """
+                    script {
+                        if (params.TOOLCHAIN == "NNTC") {
+                            sync_repository_gerrit("libsophon")
+                            sync_repository_gerrit("bm_prebuilt_toolchains")
+                            sync_repository_gerrit("nntoolchain")
+                            sh """#!/bin/bash
+                                set -e
+                                ln -s ${GIT_REPOSTORY_PATH}/libsophon ${WORKSPACE}/libsophon
+                                ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
+                                cp -v ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
+                            """
+                        } else if (params.TOOLCHAIN == "TPU-MLIR") {
+                            sync_repository_gerrit("tpu-mlir")
+                            sh """#!/bin/bash
+                                set -e
+                                cp -v ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
+                            """
+                        }
                     }
                 }
             }

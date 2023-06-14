@@ -29,6 +29,7 @@ def sync_repostory(name, url) {
     if (fileExists(path)) {
         sh """#!/bin/bash
             pushd ${path}
+            git config --global --add safe.directory  ${GIT_REPOSTORY_PATH}/${name}
             git pull && git submodule update
             popd
         """

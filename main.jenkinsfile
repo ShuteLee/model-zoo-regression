@@ -19,7 +19,13 @@ def generateStage(model) {
 def sync_repostory(name, url) {
     println("name: " + name);
     println("url: " + url);
-    println("${GIT_REPOSTORY_PATH}")
+    println("${GIT_REPOSTORY_PATH}");
+    File repPath = new File("${GIT_REPOSTORY_PATH}");
+    if (repPath.exist()) {
+        println("path exists");
+    } else {
+        println("path not exist")
+    }
 }
 
 pipeline {

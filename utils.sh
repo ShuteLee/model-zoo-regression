@@ -16,5 +16,3 @@ function sync_repository() {
     ls /var/jenkins_home/git-repository
     git clone /var/jenkins_home/git-repository/$rep_name
 }
-
-mkdir -p /var/jenkins_home/git-repository

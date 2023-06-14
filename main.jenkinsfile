@@ -37,6 +37,7 @@ pipeline {
                     sh """#!/bin/bash
                         set -e
                         rm -rf *
+                        mkdir -p /var/jenkins_home/git-repository
                         echo ===================================================1============================================
                         sync_repostory model-zoo https://github.com/sophgo/model-zoo.git
                         echo ===================================================2============================================

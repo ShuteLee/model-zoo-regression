@@ -1,21 +1,5 @@
 //===-*- Groovy -*-===
 
-def generateStage(model) {
-    return {
-        stage("${model}") {
-                dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        cd tpu-mlir/
-                        source ./envsetup.sh
-                        cd regression
-                        ./run_model.sh ${model}
-                        """
-            }
-        }
-    }
-}
-
 def sync_repository_github(name) {
     def url = "https://github.com/sophgo/${name}.git"
     println("sync the latest codes")
@@ -103,6 +87,14 @@ pipeline {
                     script {
                         for (def case_name : params.CASE_NAME.split()) {
                             println(case_name)
+                            def b = build job: 'blame', parameters: [
+                                    string(name: 'CASE_NAME', value: case_name),
+                                    string(name: 'TOOLCHAIN', value: params.TOOLCHAIN),
+                                    string(name: 'TARGET', value: params.TARGET),
+                                    string(name: 'COMMIT_SHA', value: params.COMMIT_SHA),
+                                    ], wait: true, propagate: false
+                            def varb = b.getResult()
+                            println(varb)
                         }
                     }
                 }

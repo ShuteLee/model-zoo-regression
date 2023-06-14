@@ -1,26 +1,11 @@
 //===-*- Groovy -*-===
 
-def generateStage(model) {
-    return {
-        stage("${model}") {
-                dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        cd tpu-mlir/
-                        source ./envsetup.sh
-                        cd regression
-                        ./run_model.sh ${model}
-                        """
-            }
-        }
-    }
-}
-
 pipeline {
     parameters {
+        string(name: 'CASE_NAME', defaultValue: '', description: 'Case name of a single case.')
+        string(name: 'TOOLCHAIN', defaultValue: '', description: 'NNTC/TPU-MLIR')
+        string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
-        text(name: 'CHECK_MODELS', defaultValue: '', description: 'Models should be rechecked under this version. Separated by "\\n"')
-        booleanParam(name: 'FAIL_FAST', defaultValue: false, description: 'Control whether we should exit early when one job in parallel is failed.')
     }
     agent {
         docker {
@@ -31,55 +16,28 @@ pipeline {
     stages {
         stage('Information') {
             steps {
-                echo "TPU-MLIR version: ${params.COMMIT_SHA}\nModels:\n${params.CHECK_MODELS}"
+                println("case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}")
             }
         }
-        stage('Checkout') {
+        stage('Process') {
             steps {
                 dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        rm -rf *
-                        git clone file:////git-repository/tpu-mlir.git
-                        ln -s /git-repository/nnmodels nnmodels
-                        cd tpu-mlir
-                        git checkout ${params.COMMIT_SHA} -q
-                        git show -s
-                    """
-                }
-            }
-        }
-        stage('Build') {
-            steps {
-                dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        cd tpu-mlir/
-                        source ./envsetup.sh
-                        ./build.sh
-                    """
-                }
-            }
-        }
-        stage('Test') {
-            steps {
-                script {
-                    if (params.CHECK_MODELS?.trim()) {
-                        String[] models = params.CHECK_MODELS.split("\n")
-                        def parallelStagesMap = models.collectEntries {
-                            ["${it}" : generateStage(it)]
-                        }
-                        parallelStagesMap["failFast"] = params.FAIL_FAST
-                        parallel parallelStagesMap
-                    } else {
-                        dir("$WORKSPACE") {
-                                sh """#!/bin/bash
-                                set -e
-                                cd tpu-mlir/
-                                source ./envsetup.sh
-                                cd regression
-                                ./run_all.sh
-                            """
+                    script {
+                        sh """#!/bin/bash
+                            set -e
+                            pushd ${params.TOOLCHAIN}
+                            git reset --hard ${params.COMMIT_SHA}
+                        """
+                        def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 30 --pretty=format:\"%h\"''', returnStdout: true)
+                        def commit_n = commit_n_sha.split("\n")
+                        for (def cmt_id : commit_n) {
+                            try {
+                                println("try")
+                            } catch (err) {
+                                println("catched failer, COMMIT_SHA: ${cmt_id}")
+                                println(err)
+                                break;
+                            }
                         }
                     }
                 }

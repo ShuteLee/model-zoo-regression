@@ -27,14 +27,17 @@ def sync_repostory(name, url) {
     }
     def path = "${GIT_REPOSTORY_PATH}/" + name
     if (fileExists(path)) {
-        sh "pushd ${path}"
-        sh "git pull && git submodule update"
-        sh "popd"
-        sh "pwd"
+        sh """#!/bin/bash
+            push ${path}
+            git pull && git submodule update
+            popd
+        """
     } else {
-        sh "pushd ${GIT_REPOSTORY_PATH}"
-        sh "git clone ${url}"
-        sh "popd"
+        sh """#!/bin/bash
+            push ${GIT_REPOSTORY_PATH}
+            git clone ${url}
+            popd
+        """
     }
 }
 

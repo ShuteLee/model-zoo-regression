@@ -27,17 +27,21 @@ def sync_repostory(name, url) {
     }
     def path = "${GIT_REPOSTORY_PATH}/" + name
     if (fileExists(path)) {
-        sh """#!/bin/bash
-            pushd ${path}
-            git pull && git submodule update
-            popd
-        """
+        sshagent("[fe2e3988-4815-4033-bb26-88a10586ad27]") {
+            sh """#!/bin/bash
+                pushd ${path}
+                git pull && git submodule update
+                popd
+            """
+        }
     } else {
-        sh """#!/bin/bash
-            pushd ${GIT_REPOSTORY_PATH}
-            git clone ${url}
-            popd
-        """
+        sshagent("[fe2e3988-4815-4033-bb26-88a10586ad27]") {
+            sh """#!/bin/bash
+                pushd ${GIT_REPOSTORY_PATH}
+                git clone ${url}
+                popd
+            """
+        }
     }
 }
 

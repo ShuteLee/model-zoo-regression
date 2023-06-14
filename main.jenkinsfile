@@ -73,8 +73,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 dir("$WORKSPACE") {
-                    sync_repostory("model-zoo", "https://github.com/sophgo/model-zoo.git")
-                    sync_repostory("tpu-mlir", "")
+                    sync_repository_github("model-zoo", "https://github.com/sophgo/model-zoo.git")
+                    sync_repository_gerrit("tpu-mlir")
                 }
             }
         }

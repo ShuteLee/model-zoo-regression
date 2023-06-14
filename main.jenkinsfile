@@ -16,7 +16,7 @@ def generateStage(model) {
     }
 }
 
-def sync_repository_github(name, url) {
+def sync_repository_github(name) {
     def url = "https://github.com/sophgo/${name}.git"
     println(url)
     sync_repostory(name, url)

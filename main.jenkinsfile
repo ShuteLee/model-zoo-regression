@@ -16,6 +16,15 @@ def generateStage(model) {
     }
 }
 
+def sync_repository_github(name, url) {
+    sync_repostory(name, url)
+}
+
+def sync_repository_gerrit(name) {
+    def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PWD}@gerrit-ai.sophgo.vip:8443/a/${name}"
+    sync_repostory(name, url)
+}
+
 def sync_repostory(name, url) {
     println("sync the latest codes")
     println("repository name: " + name + ", url: " + url)
@@ -27,21 +36,18 @@ def sync_repostory(name, url) {
     }
     def path = "${GIT_REPOSTORY_PATH}/" + name
     if (fileExists(path)) {
-        sshagent("[fe2e3988-4815-4033-bb26-88a10586ad27]") {
-            sh """#!/bin/bash
-                pushd ${path}
-                git pull && git submodule update
-                popd
-            """
-        }
+        sh """#!/bin/bash
+            pushd ${path}
+            git pull && git submodule update
+            popd
+        """
     } else {
-        sshagent("[fe2e3988-4815-4033-bb26-88a10586ad27]") {
-            sh """#!/bin/bash
-                pushd ${GIT_REPOSTORY_PATH}
-                git clone ${url}
-                popd
-            """
-        }
+        sh """#!/bin/bash
+            git config --global http.sslVerify false
+            pushd ${GIT_REPOSTORY_PATH}
+            git clone ${url}
+            popd
+        """
     }
 }
 
@@ -55,6 +61,7 @@ pipeline {
     agent any
     environment {
         GIT_REPOSTORY_PATH = "/var/jenkins_home/git-repository"
+        GERRIT_AC = credentials('gerrit-ac')
     }
     stages {
         stage('Information') {
@@ -66,7 +73,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     sync_repostory("model-zoo", "https://github.com/sophgo/model-zoo.git")
-                    sync_repostory("tpu-mlir", "ssh://shute.li@gerrit-ai.sophgo.vip:29418/tpu-mlir")
+                    sync_repostory("tpu-mlir", "")
                 }
             }
         }

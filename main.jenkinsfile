@@ -16,6 +16,26 @@ def generateStage(model) {
     }
 }
 
+def sync_repostory(name, url) {
+    return {
+        stage("sync_${name}") {
+            dir("$GIT_REPOSTORY_PATH") {
+                sh """#!/bin/bash
+                    mkdir -p $GIT_REPOSTORY_PATH
+                    pushd $GIT_REPOSTORY_PATH
+                    if [ -d $name ]; then
+                        pushd $name && git pull & git submodule update & popd
+                    else
+                        git clone $url
+                    fi
+                    popd
+                    git clone $GIT_REPOSTORY_PATH/$name
+                    """
+            }
+        }
+    }
+}
+
 pipeline {
     parameters {
         string(name: 'CASE_NAME', defaultValue: '', description: 'Models should be rechecked under this version.')
@@ -24,6 +44,9 @@ pipeline {
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR/NNTC .')
     }
     agent any
+    environment {
+        GIT_REPOSTORY_PATH = "/var/jenkins_home/git-repository"
+    }
     stages {
         stage('Information') {
             steps {
@@ -38,6 +61,7 @@ pipeline {
                         rm -rf *
                         mkdir -p /var/jenkins_home/git-repository
                         echo "===================================================1============================================"
+                        sync_repostory("model-zoo", "https://github.com/sophgo/model-zoo.git")
                         echo "===================================================2============================================"
                         ls
                     """

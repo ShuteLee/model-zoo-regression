@@ -111,6 +111,7 @@ pipeline {
                             """
                         }
                         def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 5 --pretty=format:\"%h\"''', returnStdout: true)
+                        println(commit_n_sha)
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {
                             println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")

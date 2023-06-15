@@ -15,9 +15,10 @@ def sync_repository_gerrit(name) {
 }
 
 def sync_repostory(name, url) {
-    if (!fileExists("${GIT_REPOSTORY_PATH}")) {
+    def rep_path = File("${GIT_REPOSTORY_PATH}")
+    if (!rep_path.exists()) {
         println("repostory path ${GIT_REPOSTORY_PATH} does not exist, creating...")
-        sh "mkdir -p ${GIT_REPOSTORY_PATH}"
+        rep_path.mkdirs()
     }
     def path = "${GIT_REPOSTORY_PATH}/" + name
     if (fileExists(path)) {

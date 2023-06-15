@@ -15,26 +15,20 @@ def sync_repository_gerrit(name) {
 }
 
 def sync_repostory(name, url) {
+    def rep_path = "${GIT_REPOSTORY_PATH}/" + name
     sh """#!/bin/bash
         set -e
         mkdir -p "${GIT_REPOSTORY_PATH}"
-    """
-    def path = "${GIT_REPOSTORY_PATH}/" + name
-    if (fileExists(path)) {
-        sh """#!/bin/bash
-            set -e
-            pushd ${path}
+        if [ -d "${GIT_REPOSTORY_PATH}" ]; then
+            pushd ${rep_path}
             git pull && git submodule update
             popd
-        """
-    } else {
-        sh """#!/bin/bash
-            set -e
+        else
             pushd ${GIT_REPOSTORY_PATH}
             git clone ${url}
             popd
-        """
-    }
+        fi
+    """
 }
 
 pipeline {

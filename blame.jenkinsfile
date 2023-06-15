@@ -110,6 +110,11 @@ pipeline {
                                             label 'se7'
                                         }
                                         dir ("$WORKSPACE") {
+                                            println("$WORKSPACE")
+                                            sh """#!/bin/bash
+                                                set -e
+                                                pwd
+                                            """
                                             println("try runtime: ${cmt_id}")
                                         }
                                     }

@@ -47,8 +47,8 @@ pipeline {
     agent {
         docker {
             image 'sophgo/tpuc_dev'
+            label 'linux'
         }
-        label 'linux'
     }
     environment {
         GIT_REPOSTORY_PATH = "/var/jenkins_home/git-repository"

@@ -68,13 +68,13 @@ pipeline {
                                 set -e
                                 ln -s ${GIT_REPOSTORY_PATH}/libsophon ${WORKSPACE}/libsophon
                                 ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
-                                cp -v ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
+                                git clone ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
                             """
                         } else if (params.TOOLCHAIN == "tpu-mlir") {
                             sync_repository_gerrit("tpu-mlir")
                             sh """#!/bin/bash
                                 set -e
-                                cp -rv ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
+                                git clone ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
                             """
                         }
                     }

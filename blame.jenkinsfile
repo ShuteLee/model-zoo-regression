@@ -44,16 +44,16 @@ pipeline {
         string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
     }
+    environment {
+        REPOSITORY_HOST_PATH = "/home/shuteli/jenkins/data/git-repository"
+        GIT_REPOSTORY_PATH = "/var/jenkins_home/git-repository"
+        GERRIT_AC = credentials('gerrit-ac')
+    }
     agent {
         docker {
             image 'sophgo/tpuc_dev'
             args "-v ${REPOSITORY_HOST_PATH}:${GIT_REPOSTORY_PATH}"
         }
-    }
-    environment {
-        REPOSITORY_HOST_PATH = "/home/shuteli/jenkins/data/git-repository"
-        GIT_REPOSTORY_PATH = "/var/jenkins_home/git-repository"
-        GERRIT_AC = credentials('gerrit-ac')
     }
     stages {
         stage('Information') {

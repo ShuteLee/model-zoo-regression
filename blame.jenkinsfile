@@ -38,14 +38,7 @@ pipeline {
         string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
     }
-    agent {
-        // docker {
-        //     image 'sophgo/tpuc_dev'
-        //     args "-v /home/jenkins/git-repository:/git-repository"
-        //     label 'linux'
-        // }
-        any
-    }
+    agent any
     environment {
         GIT_REPOSTORY_PATH = "/home/jenkins/git-repository"
         GERRIT_AC = credentials('gerrit-ac')

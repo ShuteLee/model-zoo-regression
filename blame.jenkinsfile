@@ -93,13 +93,13 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        sh """#!/bin/bash
-                            set -e
-                            apt-get update
-                            apt-get install git-lfs -y
-                            git config --unset core.hooksPath
-                            git lfs install --force
-                        """
+                        // sh """#!/bin/bash
+                        //     set -e
+                        //     apt-get update
+                        //     apt-get install git-lfs -y
+                        //     git config --unset core.hooksPath
+                        //     git lfs install --force
+                        // """
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             sh """#!/bin/bash
                                 set -e

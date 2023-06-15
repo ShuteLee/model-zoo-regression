@@ -122,7 +122,7 @@ pipeline {
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
                             println(commit_n_sha)
-                            dir("${WORKSPACE}/${params.TOOLCHAIN}") {
+                            dir("${WORKSPACE}") {
                                 def lss = sh(script: "tree -L 2", returnStdout: true)
                                 println(lss)
                             }

@@ -103,7 +103,7 @@ pipeline {
                             set -e
                             apt-get update
                             apt-get install git-lfs -y
-                            git lfs install
+                            git lfs install --force
                         """
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             sh """#!/bin/bash

@@ -102,7 +102,7 @@ pipeline {
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {
                             try {
-                                println("try")
+                                println("try: ${cmt_id}")
                             } catch (err) {
                                 println("catched failer, COMMIT_SHA: ${cmt_id}")
                                 println(err)

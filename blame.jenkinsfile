@@ -54,6 +54,7 @@ pipeline {
     environment {
         GIT_REPOSTORY_PATH = "/git-repository"
         GERRIT_AC = credentials('gerrit-ac')
+        GIT_SSL_NO_VERIFY = 1
     }
     stages {
         stage('Information') {

@@ -99,6 +99,10 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
+                        sh """#!/bin/bash
+                            set -e
+                            git lfs install
+                        """
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             sh """#!/bin/bash
                                 set -e

@@ -122,10 +122,10 @@ pipeline {
                                         ], wait: true, propagate: false
                                 def varb = b.getResult()
                                 println(varb)
+                                break;
                             } catch (err) {
                                 println("catched failer, COMMIT_SHA: ${cmt_id}")
                                 println(err)
-                                break;
                             }
                         }
                     }

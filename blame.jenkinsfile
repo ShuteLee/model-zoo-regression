@@ -99,7 +99,25 @@ pipeline {
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {
                             try {
-                                println("try: ${cmt_id}")
+                                stage("build_${cmt_id}") {
+                                    dir ("$WORKSPACE") {
+                                        println("try build: ${cmt_id}")
+                                    }
+                                }
+                                try {
+                                    stage("runtime_${cmt_id}") {
+                                        agent {
+                                            label 'se7'
+                                        }
+                                        steps {
+                                            println("try runtime: ${cmt_id}")
+                                        }
+                                    }
+                                } catch (err) {
+                                    println("runtime catched failer, COMMIT_SHA: ${cmt_id}")
+                                    println(err)
+                                    break;
+                                }
                             } catch (err) {
                                 println("catched failer, COMMIT_SHA: ${cmt_id}")
                                 println(err)

@@ -103,6 +103,7 @@ pipeline {
                             set -e
                             apt-get update
                             apt-get install git-lfs -y
+                            apt-get install tree -y
                             git config --unset core.hooksPath
                             git lfs install --force
                         """
@@ -121,8 +122,10 @@ pipeline {
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
                             println(commit_n_sha)
-                            def lss = sh(script: "ls ${WORKSPACE}", returnStdout: true)
-                            println(lss)
+                            dir("${WORKSPACE}/${params.TOOLCHAIN}") {
+                                def lss = sh(script: "tree -L 2", returnStdout: true)
+                                println(lss)
+                            }
                             def commit_n = commit_n_sha.split("\n")
                             for (def cmt_id : commit_n) {
                                 println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")

@@ -10,7 +10,6 @@ pipeline {
     agent {
         docker {
             image 'sophgo/tpuc_dev'
-            label 'local'
         }
     }
     stages {

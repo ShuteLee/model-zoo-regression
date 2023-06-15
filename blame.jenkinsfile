@@ -104,7 +104,7 @@ pipeline {
                             pushd ${params.TOOLCHAIN}
                             git reset --hard ${params.COMMIT_SHA}
                         """
-                        dir("${WORKSPACE}/blame-regression") {
+                        dir("${WORKSPACE}/blame-regression/test") {
                             sh """#!/bin/bash
                                 set -e
                                 pip3 install -r requirements.txt

@@ -1,5 +1,22 @@
 //===-*- Groovy -*-===
 
+def genParallelStage(case_name) {
+    return {
+        stage (case_name) {
+            steps {
+                def b = build job: 'blame', parameters: [
+                        string(name: 'CASE_NAME', value: case_name),
+                        string(name: 'TOOLCHAIN', value: params.TOOLCHAIN),
+                        string(name: 'TARGET', value: params.TARGET),
+                        string(name: 'COMMIT_SHA', value: params.COMMIT_SHA),
+                        ], wait: true, propagate: false
+                def varb = b.getResult()
+                println(varb)
+            }
+        }
+    }
+}
+
 pipeline {
     parameters {
         string(name: 'CASE_NAME', defaultValue: '', description: 'Models should be rechecked under this version.')
@@ -22,17 +39,10 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        for (def case_name : params.CASE_NAME.split()) {
-                            println(case_name)
-                            def b = build job: 'blame', parameters: [
-                                    string(name: 'CASE_NAME', value: case_name),
-                                    string(name: 'TOOLCHAIN', value: params.TOOLCHAIN),
-                                    string(name: 'TARGET', value: params.TARGET),
-                                    string(name: 'COMMIT_SHA', value: params.COMMIT_SHA),
-                                    ], wait: true, propagate: false
-                            def varb = b.getResult()
-                            println(varb)
+                        def stepsForParallel = params.CASE_NAME.split().collectEntries {
+                            ["${it}" : genParallelStage(it)]
                         }
+                        parallel stepsForParallel
                     }
                 }
             }

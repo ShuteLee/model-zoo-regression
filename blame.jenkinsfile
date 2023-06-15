@@ -105,7 +105,7 @@ pipeline {
                                     }
                                 }
                                 def b = build job: 'runtime', parameters: [
-                                        string(name: 'CASE_NAME', value: ${params.CASE_NAME}),
+                                        string(name: 'CASE_NAME', value: params.CASE_NAME),
                                         string(name: 'TARGET', value: params.TARGET)
                                         ], wait: true, propagate: false
                                 def varb = b.getResult()

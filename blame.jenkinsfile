@@ -113,6 +113,7 @@ pipeline {
                         def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 5 --pretty=format:\"%h\"''', returnStdout: true)
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {
+                            println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")
                             try {
                                 stage("build_${cmt_id}") {
                                     dir ("${WORKSPACE}/blame-regression") {
@@ -128,9 +129,10 @@ pipeline {
                                         ], wait: true, propagate: false
                                 def varb = b.getResult()
                                 println(varb)
+                                println("---------------------------------------------------- GOT SUCESS: ${cmt_id}--------------------------------")
                                 break;
                             } catch (err) {
-                                println("catched failer, COMMIT_SHA: ${cmt_id}")
+                                println("============================================================================catched failer, COMMIT_SHA: ${cmt_id}==========================================================")
                                 println(err)
                             }
                         }

@@ -1,3 +1,36 @@
+//===-*- Groovy -*-===
+
+def sync_repository_github(name) {
+    def url = "https://github.com/sophgo/${name}.git"
+    println("sync the latest codes")
+    println("repository name: " + name + ", url: " + url)
+    sync_repostory(name, url)
+}
+
+def sync_repository_gerrit(name) {
+    def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PSW}@gerrit-ai.sophgo.vip:8443/a/${name}"
+    println("sync the latest codes")
+    println("repository name: " + name + ", url: " + url)
+    sync_repostory(name, url)
+}
+
+def sync_repostory(name, url) {
+    def rep_path = "${GIT_REPOSTORY_PATH}/" + name
+    sh """#!/bin/bash
+        set -e
+        mkdir -p "${GIT_REPOSTORY_PATH}"
+        if [ -d "${rep_path}" ]; then
+            pushd ${rep_path}
+            git pull && git submodule update
+            popd
+        else
+            pushd ${GIT_REPOSTORY_PATH}
+            git clone ${url}
+            popd
+        fi
+    """
+}
+
 pipeline {
     parameters {
         string(name: 'CASE_NAME', defaultValue: '', description: 'Case name of a single case.')
@@ -8,11 +41,30 @@ pipeline {
     }
     environment {
         BMODEL_PATH = ""
+        GIT_REPOSTORY_PATH = "/git-repository"
     }
     stages {
         stage('Information') {
             steps {
                 println("RUNTIME: case name: ${params.CASE_NAME}, target selected: ${params.TARGET}")
+            }
+        }
+        stage('CodeSync') {
+            steps {
+                dir("$WORKSPACE") {
+                    sh """#!/bin/bash
+                        set -e
+                        rm -rf *
+                    """
+                    sync_repository_github("model-zoo")
+                    script {
+                        sh """#!/bin/bash
+                            set -e
+                            git clone ${GIT_REPOSTORY_PATH}/model-zoo ${WORKSPACE}
+                            git clone https://github.com/QinyuZHAO0/blame-regression.git
+                        """
+                    }
+                }
             }
         }
         stage('Process') {

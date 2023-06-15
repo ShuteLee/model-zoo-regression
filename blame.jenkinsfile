@@ -77,18 +77,19 @@ pipeline {
                                 set -e
                                 ln -s ${GIT_REPOSTORY_PATH}/libsophon ${WORKSPACE}/libsophon
                                 ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
-                                git clone ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
+                                git clone ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}
                             """
                         } else if (params.TOOLCHAIN == "tpu-mlir") {
                             sync_repository_gerrit("tpu-mlir")
                             sh """#!/bin/bash
                                 set -e
-                                git clone ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
+                                git clone ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}
                             """
                         }
                         sh """#!/bin/bash
                             set -e
-                            git clone git@github.com:QinyuZHAO0/blame-regression.git
+                            git clone ${GIT_REPOSTORY_PATH}/model-zoo ${WORKSPACE}
+                            git clone https://github.com/QinyuZHAO0/blame-regression.git
                         """
                     }
                 }

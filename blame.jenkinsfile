@@ -104,7 +104,7 @@ pipeline {
                                         println("try build: ${cmt_id}")
                                     }
                                 }
-                                def b = build job: 'blame', parameters: [
+                                def b = build job: 'runtime', parameters: [
                                         string(name: 'CASE_NAME', value: ${params.CASE_NAME}),
                                         string(name: 'TARGET', value: params.TARGET)
                                         ], wait: true, propagate: false

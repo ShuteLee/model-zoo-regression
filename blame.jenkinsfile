@@ -99,19 +99,22 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        sh """#!/bin/bash
-                            set -e
-                            pushd ${params.TOOLCHAIN}
-                            git reset --hard ${params.COMMIT_SHA}
-                        """
+                        dir("${params.TOOLCHAIN}") {
+                            sh """#!/bin/bash
+                                set -e
+                                git reset --hard ${params.COMMIT_SHA}
+                            """
+                        }
                         dir("${WORKSPACE}/blame-regression/test") {
                             sh """#!/bin/bash
                                 set -e
                                 pip3 install -r requirements.txt
                             """
                         }
-                        def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 5 --pretty=format:\"%h\"''', returnStdout: true)
-                        println(commit_n_sha)
+                        dir("${params.TOOLCHAIN}") {
+                            def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
+                            println(commit_n_sha)
+                        }
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {
                             println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")

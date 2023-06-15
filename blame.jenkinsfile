@@ -67,7 +67,7 @@ pipeline {
                         set -e
                         rm -rf *
                     """
-                    sync_repository_github("model-zoo")
+                    // sync_repository_github("model-zoo")
                     script {
                         if (params.TOOLCHAIN == "nntoolchain") {
                             sync_repository_gerrit("libsophon")
@@ -88,7 +88,7 @@ pipeline {
                         }
                         sh """#!/bin/bash
                             set -e
-                            git clone ${GIT_REPOSTORY_PATH}/model-zoo ${WORKSPACE}/model-zoo
+                            git clone "https://github.com/sophgo/model-zoo.git"
                             git clone https://github.com/QinyuZHAO0/blame-regression.git
                         """
                     }

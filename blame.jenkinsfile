@@ -48,7 +48,6 @@ pipeline {
         docker {
             image 'sophgo/tpuc_dev'
             args "-v /home/jenkins/git-repository:/git-repository"
-            args "-u 0:0"
             label 'linux'
         }
     }

@@ -104,6 +104,12 @@ pipeline {
                             pushd ${params.TOOLCHAIN}
                             git reset --hard ${params.COMMIT_SHA}
                         """
+                        dir("${WORKSPACE}/blame-regression") {
+                            sh """#!/bin/bash
+                                set -e
+                                pip3 install -r requirements.txt
+                            """
+                        }
                         def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 5 --pretty=format:\"%h\"''', returnStdout: true)
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {

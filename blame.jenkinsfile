@@ -111,11 +111,8 @@ pipeline {
                                         }
                                         dir ("$WORKSPACE") {
                                             println("$WORKSPACE")
-                                            sh """#!/bin/bash
-                                                set -e
-                                                pwd
-                                            """
                                             println("try runtime: ${cmt_id}")
+                                            println(sh(script: '''pwd''', returnStdout: true))
                                         }
                                     }
                                 } catch (err) {

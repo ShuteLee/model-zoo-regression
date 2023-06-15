@@ -3,7 +3,7 @@
 def genParallelStage(case_name) {
     return {
         stage (case_name) {
-            steps {
+            dir("$WORKSPACE") {
                 def b = build job: 'blame', parameters: [
                         string(name: 'CASE_NAME', value: case_name),
                         string(name: 'TOOLCHAIN', value: params.TOOLCHAIN),

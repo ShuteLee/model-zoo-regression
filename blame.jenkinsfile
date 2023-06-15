@@ -109,7 +109,7 @@ pipeline {
                         dir("${WORKSPACE}/blame-regression/test") {
                             sh """#!/bin/bash
                                 set -e
-                                /usr/bin/pip3 install -r requirements.txt
+                                pip3 install -r requirements.txt
                             """
                         }
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {

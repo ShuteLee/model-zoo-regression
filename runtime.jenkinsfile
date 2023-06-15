@@ -21,6 +21,10 @@ pipeline {
                     script {
                         println("runtime start.....")
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
+                        sh """#!/bin/bash
+                            set -e
+                            python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME}
+                        """
                     }
                 }
             }

@@ -49,6 +49,10 @@ pipeline {
         GIT_REPOSTORY_PATH = "/git-repository"
         GERRIT_AC = credentials('gerrit-ac')
         GIT_SSL_NO_VERIFY = 1
+        DATA_SERVER = "http://172.28.9.198/webdav/dataset"
+        FTP_SERVER = "ftp://AI:SophgoRelease2022@172.28.141.89"
+        SWAP_SERVER = "http://172.28.142.120/webdav/swap"
+        OUTPUT_TMP = "/tmp/dummy.github.output.txt"
     }
     stages {
         stage('Information') {
@@ -82,6 +86,10 @@ pipeline {
                                 git clone ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
                             """
                         }
+                        sh """#!/bin/bash
+                            set -e
+                            git clone git@github.com:QinyuZHAO0/blame-regression.git
+                        """
                     }
                 }
             }
@@ -95,13 +103,16 @@ pipeline {
                             pushd ${params.TOOLCHAIN}
                             git reset --hard ${params.COMMIT_SHA}
                         """
-                        def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 3 --pretty=format:\"%h\"''', returnStdout: true)
+                        def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 5 --pretty=format:\"%h\"''', returnStdout: true)
                         def commit_n = commit_n_sha.split("\n")
                         for (def cmt_id : commit_n) {
                             try {
                                 stage("build_${cmt_id}") {
-                                    dir ("$WORKSPACE") {
-                                        println("try build: ${cmt_id}")
+                                    dir ("${WORKSPACE}/blame-regression") {
+                                        sh """#!/bin/bash
+                                            set -e
+                                            python3 -m pytest test -m "mlir and build" --target=${params.TARGET} --commit_id ${cmt_id} --case_name ${params.CASE_NAME}
+                                        """
                                     }
                                 }
                                 def b = build job: 'runtime', parameters: [

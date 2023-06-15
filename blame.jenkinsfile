@@ -47,7 +47,7 @@ pipeline {
     agent {
         docker {
             image 'sophgo/tpuc_dev'
-            args "-v /home/shuteli/jenkins/data/git-repository:${GIT_REPOSTORY_PATH}"
+            args "-v /home/shuteli/jenkins/data/git-repository:/var/jenkins_home/git-repository"
         }
     }
     environment {

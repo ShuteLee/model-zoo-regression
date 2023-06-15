@@ -47,11 +47,9 @@ pipeline {
     agent {
         docker {
             image 'sophgo/tpuc_dev'
-            // args "-v /home/shuteli/jenkins/data/git-repository:/var/jenkins_home/git-repository"
         }
     }
     environment {
-        // REPOSITORY_HOST_PATH = "/home/shuteli/jenkins/data/git-repository"
         GIT_REPOSTORY_PATH = "/var/jenkins_home/git-repository"
         GERRIT_AC = credentials('gerrit-ac')
     }
@@ -64,12 +62,12 @@ pipeline {
         stage('CodeSync') {
             steps {
                 dir("$WORKSPACE") {
+                    sh """#!/bin/bash
+                        set -e
+                        rm -rf *
+                    """
                     sync_repository_github("model-zoo")
                     script {
-                        sh """#!/bin/bash
-                            set -e
-                            ls /var/jenkins_home
-                        """
                         if (params.TOOLCHAIN == "nntoolchain") {
                             sync_repository_gerrit("libsophon")
                             sync_repository_gerrit("bm_prebuilt_toolchains")

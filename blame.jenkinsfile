@@ -99,7 +99,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        dir("${params.TOOLCHAIN}") {
+                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             sh """#!/bin/bash
                                 set -e
                                 git reset --hard ${params.COMMIT_SHA}
@@ -111,33 +111,33 @@ pipeline {
                                 pip3 install -r requirements.txt
                             """
                         }
-                        dir("${params.TOOLCHAIN}") {
+                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
                             println(commit_n_sha)
-                        }
-                        def commit_n = commit_n_sha.split("\n")
-                        for (def cmt_id : commit_n) {
-                            println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")
-                            try {
-                                stage("build_${cmt_id}") {
-                                    dir ("${WORKSPACE}/blame-regression") {
-                                        sh """#!/bin/bash
-                                            set -e
-                                            python3 -m pytest test -m "mlir and build" --target=${params.TARGET} --commit_id ${cmt_id} --case_name ${params.CASE_NAME}
-                                        """
+                            def commit_n = commit_n_sha.split("\n")
+                            for (def cmt_id : commit_n) {
+                                println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")
+                                try {
+                                    stage("build_${cmt_id}") {
+                                        dir ("${WORKSPACE}/blame-regression") {
+                                            sh """#!/bin/bash
+                                                set -e
+                                                python3 -m pytest test -m "mlir and build" --target=${params.TARGET} --commit_id ${cmt_id} --case_name ${params.CASE_NAME}
+                                            """
+                                        }
                                     }
+                                    def b = build job: 'runtime', parameters: [
+                                            string(name: 'CASE_NAME', value: params.CASE_NAME),
+                                            string(name: 'TARGET', value: params.TARGET)
+                                            ], wait: true, propagate: false
+                                    def varb = b.getResult()
+                                    println(varb)
+                                    println("---------------------------------------------------- GOT SUCESS: ${cmt_id}--------------------------------")
+                                    break;
+                                } catch (err) {
+                                    println("============================================================================catched failer, COMMIT_SHA: ${cmt_id}==========================================================")
+                                    println(err)
                                 }
-                                def b = build job: 'runtime', parameters: [
-                                        string(name: 'CASE_NAME', value: params.CASE_NAME),
-                                        string(name: 'TARGET', value: params.TARGET)
-                                        ], wait: true, propagate: false
-                                def varb = b.getResult()
-                                println(varb)
-                                println("---------------------------------------------------- GOT SUCESS: ${cmt_id}--------------------------------")
-                                break;
-                            } catch (err) {
-                                println("============================================================================catched failer, COMMIT_SHA: ${cmt_id}==========================================================")
-                                println(err)
                             }
                         }
                     }

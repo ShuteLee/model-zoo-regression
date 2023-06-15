@@ -47,7 +47,7 @@ pipeline {
     agent {
         docker {
             image 'sophgo/tpuc_dev'
-            args "-v /home/jenkins/git-repository:/git-repository"
+            args "-v /home/jenkins/git-repository:/git-repository -user root"
             label 'linux'
         }
     }

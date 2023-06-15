@@ -1,42 +1,5 @@
 //===-*- Groovy -*-===
 
-def sync_repository_github(name) {
-    def url = "https://github.com/sophgo/${name}.git"
-    println("sync the latest codes")
-    println("repository name: " + name + ", url: " + url)
-    sync_repostory(name, url)
-}
-
-def sync_repository_gerrit(name) {
-    def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PSW}@gerrit-ai.sophgo.vip:8443/a/${name}"
-    println("sync the latest codes")
-    println("repository name: " + name + ", url: " + url)
-    sync_repostory(name, url)
-}
-
-def sync_repostory(name, url) {
-    if (!fileExists("${GIT_REPOSTORY_PATH}")) {
-        println("repostory path ${GIT_REPOSTORY_PATH} does not exist, creating...")
-        sh "mkdir -p ${GIT_REPOSTORY_PATH}"
-    }
-    def path = "${GIT_REPOSTORY_PATH}/" + name
-    if (fileExists(path)) {
-        sh """#!/bin/bash
-            set -e
-            pushd ${path}
-            git pull && git submodule update
-            popd
-        """
-    } else {
-        sh """#!/bin/bash
-            set -e
-            pushd ${GIT_REPOSTORY_PATH}
-            git clone ${url}
-            popd
-        """
-    }
-}
-
 pipeline {
     parameters {
         string(name: 'CASE_NAME', defaultValue: '', description: 'Models should be rechecked under this version.')
@@ -53,32 +16,6 @@ pipeline {
         stage('Information') {
             steps {
                 println("case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}")
-            }
-        }
-        stage('CodeSync') {
-            steps {
-                dir("$WORKSPACE") {
-                    sync_repository_github("model-zoo")
-                    script {
-                        if (params.TOOLCHAIN == "nntoolchain") {
-                            sync_repository_gerrit("libsophon")
-                            sync_repository_gerrit("bm_prebuilt_toolchains")
-                            sync_repository_gerrit("nntoolchain")
-                            sh """#!/bin/bash
-                                set -e
-                                ln -s ${GIT_REPOSTORY_PATH}/libsophon ${WORKSPACE}/libsophon
-                                ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
-                                git clone ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
-                            """
-                        } else if (params.TOOLCHAIN == "tpu-mlir") {
-                            sync_repository_gerrit("tpu-mlir")
-                            sh """#!/bin/bash
-                                set -e
-                                git clone ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
-                            """
-                        }
-                    }
-                }
             }
         }
         stage('CaseSplit') {

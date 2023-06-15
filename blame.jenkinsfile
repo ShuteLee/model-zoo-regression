@@ -39,14 +39,15 @@ pipeline {
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
     }
     agent {
-        docker {
-            image 'sophgo/tpuc_dev'
-            args "-v /home/jenkins/git-repository:/git-repository"
-            label 'linux'
-        }
+        // docker {
+        //     image 'sophgo/tpuc_dev'
+        //     args "-v /home/jenkins/git-repository:/git-repository"
+        //     label 'linux'
+        // }
+        any
     }
     environment {
-        GIT_REPOSTORY_PATH = "/git-repository"
+        GIT_REPOSTORY_PATH = "/home/jenkins/git-repository"
         GERRIT_AC = credentials('gerrit-ac')
         GIT_SSL_NO_VERIFY = 1
         DATA_SERVER = "http://172.28.9.198/webdav/dataset"

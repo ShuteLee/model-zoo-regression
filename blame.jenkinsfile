@@ -109,7 +109,7 @@ pipeline {
                                         agent {
                                             label 'se7'
                                         }
-                                        steps {
+                                        dir ("$WORKSPACE") {
                                             println("try runtime: ${cmt_id}")
                                         }
                                     }

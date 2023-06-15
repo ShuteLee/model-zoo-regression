@@ -1,0 +1,29 @@
+pipeline {
+    parameters {
+        string(name: 'CASE_NAME', defaultValue: '', description: 'Case name of a single case.')
+        string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
+    }
+    agent {
+        label 'se7'
+    }
+    environment {
+        BMODEL_PATH = ""
+    }
+    stages {
+        stage('Information') {
+            steps {
+                println("RUNTIME: case name: ${params.CASE_NAME}, target selected: ${params.TARGET}")
+            }
+        }
+        stage('Process') {
+            steps {
+                dir("$WORKSPACE") {
+                    script {
+                        println("runtime start.....")
+                        println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
+                    }
+                }
+            }
+        }
+    }
+}

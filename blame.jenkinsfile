@@ -104,22 +104,12 @@ pipeline {
                                         println("try build: ${cmt_id}")
                                     }
                                 }
-                                try {
-                                    stage("runtime_${cmt_id}") {
-                                        agent {
-                                            label 'se7'
-                                        }
-                                        dir ("$WORKSPACE") {
-                                            println("$WORKSPACE")
-                                            println("try runtime: ${cmt_id}")
-                                            println(sh(script: '''pwd''', returnStdout: true))
-                                        }
-                                    }
-                                } catch (err) {
-                                    println("runtime catched failer, COMMIT_SHA: ${cmt_id}")
-                                    println(err)
-                                    break;
-                                }
+                                def b = build job: 'blame', parameters: [
+                                        string(name: 'CASE_NAME', value: ${params.CASE_NAME}),
+                                        string(name: 'TARGET', value: params.TARGET)
+                                        ], wait: true, propagate: false
+                                def varb = b.getResult()
+                                println(varb)
                             } catch (err) {
                                 println("catched failer, COMMIT_SHA: ${cmt_id}")
                                 println(err)

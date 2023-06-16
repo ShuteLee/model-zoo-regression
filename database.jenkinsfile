@@ -29,7 +29,7 @@ def sync_repostory(name, url) {
 
 def query_latestes_build_sucess(case_name) {
     getDatabaseConnection(type: 'GLOBAL') {
-        def results = sql(sql: "SELECT cmt_id FROM build_table WHERE case_name=${case_name} AND build_status=0 ORDER BY build_id  DESC LIMIT 1;")
+        def results = sql(sql: "SELECT commit_sha FROM build_table WHERE case_name=${case_name} AND build_status=0 ORDER BY build_id  DESC LIMIT 1;")
         println("query results, latestes_build_sucess: ${results}")
         return results
     }

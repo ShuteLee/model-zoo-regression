@@ -1,10 +1,27 @@
 //===-*- Groovy -*-===
+@Grab('com.opencsv:opencsv:5.4')
+import com.opencsv.CSVReader
 
 def query_latestes_build_sucess(case_name) {
     getDatabaseConnection(type: 'GLOBAL') {
         results = sql(sql: "SELECT commit_id FROM build_table WHERE case_name='${case_name}' ORDER BY build_date DESC LIMIT 1")
         println("items: ${results}")
     }
+}
+
+def parse_profile(file_name) {
+    def csvFile = new File("${file_name}")
+    def csvReader = new CSVReader(csvFile.newReader())
+    def header = csvReader.readNext()
+    def data = []
+    while ((line = csvReader.readNext()) != null) {
+        def rowData = [:]
+        for (int i = 0; i < header.size(); i++) {
+            rowData[header[i]] = line[i]
+        }
+        data << rowData
+    }
+    println data
 }
 
 pipeline {
@@ -20,6 +37,7 @@ pipeline {
                 dir("$WORKSPACE") {
                     script {
                         query_latestes_build_sucess("yolo")
+                        parse_profile("status.csv")
                     }
                 }
             }

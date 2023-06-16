@@ -51,7 +51,7 @@ pipeline {
         docker {
             image 'sophgo/tpuc_dev'
             args "-v /home/jenkins/git-repository:/git-repository"
-            label 'linux'
+            label 'linux-sc5-sc7'
         }
     }
     environment {

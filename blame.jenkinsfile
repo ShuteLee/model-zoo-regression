@@ -111,6 +111,7 @@ pipeline {
                         sh """#!/bin/bash
                             set -e
                             apt-get update
+                            apt-get install git -y
                             apt-get install git-lfs -y
                             apt-get install tree -y
                             git config --unset core.hooksPath

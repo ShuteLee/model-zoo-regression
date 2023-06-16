@@ -110,13 +110,13 @@ pipeline {
                                 def lss = sh(script: "tree -L 2", returnStdout: true)
                                 println(lss)
                             }
-                            getDatabaseConnection(type: 'GLOBAL') {
-                                def result = sql(sql: "show databases;")
-                                println "Class of result: ${result.getClass().toString()}"
-                                println "Value of result: ${result}"
-                                def items = sql(sql: "select * from build_table")
-                                println("items: ${items}")
-                            }
+                            // getDatabaseConnection(type: 'GLOBAL') {
+                            //     def result = sql(sql: "show databases;")
+                            //     println "Class of result: ${result.getClass().toString()}"
+                            //     println "Value of result: ${result}"
+                            //     def items = sql(sql: "select * from build_table")
+                            //     println("items: ${items}")
+                            // }
                             def commit_n = commit_n_sha.split("\n")
                             for (def cmt_id : commit_n) {
                                 println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")

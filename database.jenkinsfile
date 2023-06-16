@@ -8,10 +8,10 @@ def query_latestes_build_sucess(case_name) {
 }
 
 def parse_profile(file_name) {
-    def records = readCSV file: "${file_name}", format: CSVFormat.DEFAULT.withHeader()
+    def records = readCSV file: "${file_name}"
     println(records.getClass().toString())
     for (def d : records) {
-        println(d)
+        println(d.toMap())
     }
     println data
 }

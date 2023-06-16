@@ -1,6 +1,4 @@
 //===-*- Groovy -*-===
-@Grab('com.opencsv:opencsv:5.4')
-import com.opencsv.CSVReader
 
 def query_latestes_build_sucess(case_name) {
     getDatabaseConnection(type: 'GLOBAL') {

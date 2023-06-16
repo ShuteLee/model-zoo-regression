@@ -1,36 +1,131 @@
 //===-*- Groovy -*-===
 
-def query_latestes_build_sucess(case_name) {
-    getDatabaseConnection(type: 'GLOBAL') {
-        results = sql(sql: "SELECT commit_id FROM build_table WHERE case_name='${case_name}' ORDER BY build_date DESC LIMIT 1")
-        println("items: ${results}")
-    }
+def sync_repository_github(name) {
+    def url = "https://github.com/sophgo/${name}.git"
+    println("sync the latest codes")
+    println("repository name: " + name + ", url: " + url)
+    sync_repostory(name, url)
 }
 
-def parse_profile(file_name) {
-    def records = readCSV file: "${file_name}", format: CSVFormat.DEFAULT.withHeader()
-    println(records.getClass().toString())
-    for (def d : records) {
-        
-        println(d['name'] + " " + d['prec'] + " " + d['shape'] + " " + d['gops'] + " " + d['mac_utilization'] + " " + d['ddr_utilization'] + " " + d['cpu_usage'])
+def sync_repository_gerrit(name) {
+    def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PSW}@gerrit-ai.sophgo.vip:8443/a/${name}"
+    println("sync the latest codes")
+    println("repository name: " + name + ", url: " + url)
+    sync_repostory(name, url)
+}
+
+def sync_repostory(name, url) {
+    sh """#!/bin/bash
+        set -e
+        if [ -d "${name}" ]; then
+            pushd ${name}
+            git pull && git submodule update
+            popd
+        else
+            git clone ${url}
+        fi
+    """
+}
+
+def query_latestes_build_sucess(case_name) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        def results = sql(sql: "SELECT cmt_id FROM build_table WHERE case_name=${case_name} AND build_status=0 ORDER BY build_id  DESC LIMIT 1;")
+        println("query results, latestes_build_sucess: ${results}")
+        return results
     }
-    println records
 }
 
 pipeline {
-    agent any
+    parameters {
+        string(name: 'CASE_NAME', defaultValue: '', description: 'Case name of a single case.')
+        string(name: 'TOOLCHAIN', defaultValue: '', description: 'NNTC/TPU-MLIR')
+        string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
+        string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
+    }
+    agent {
+        label 'linux-sc5-sc7'
+    }
+    environment {
+        GIT_REPOSTORY_PATH = "/git-repository"
+        GERRIT_AC = credentials('gerrit-ac')
+        GIT_SSL_NO_VERIFY = 1
+        DATA_SERVER = "http://172.28.9.198/webdav/dataset"
+        FTP_SERVER = "ftp://AI:SophgoRelease2022@172.28.141.89"
+        SWAP_SERVER = "http://172.28.142.120/webdav/swap"
+        OUTPUT_TMP = "/tmp/dummy.github.output.txt"
+    }
     stages {
         stage('Information') {
             steps {
                 println("case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}")
+                sh """#!/bin/bash
+                    set -e
+                    apt-get update
+                    apt-get install git -y
+                    apt-get install git-lfs -y
+                    apt-get install tree -y
+                    git config --unset core.hooksPath
+                    git lfs install --force
+                """
             }
         }
-        stage('CaseSplit') {
+        stage('CodeSync') {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        query_latestes_build_sucess("yolo")
-                        parse_profile("status.csv")
+                        if (params.TOOLCHAIN == "nntoolchain") {
+                            sync_repository_gerrit("libsophon")
+                            sync_repository_gerrit("bm_prebuilt_toolchains")
+                            sync_repository_gerrit("nntoolchain")
+                        } else if (params.TOOLCHAIN == "tpu-mlir") {
+                            sync_repository_gerrit("tpu-mlir")
+                        }
+                        sync_repository_github("model-zoo")
+                        sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
+                    }
+                }
+            }
+        }
+        stage('Process') {
+            steps {
+                dir("$WORKSPACE") {
+                    script {
+                        def latest_build_s = latestes_build_sucess(params.CASE_NAME)
+                        println(latest_build_s)
+                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
+                            sh """#!/bin/bash
+                                set -e
+                                git reset --hard ${params.COMMIT_SHA}
+                            """
+                        }
+                        dir("${WORKSPACE}/blame-regression/test") {
+                            sh """#!/bin/bash
+                                set -e
+                                pip3 install -r requirements.txt
+                            """
+                        }
+                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
+                            def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
+                            println(commit_n_sha)
+                            dir("${WORKSPACE}") {
+                                def lss = sh(script: "tree -L 2", returnStdout: true)
+                                println(lss)
+                            }
+                            def commit_n = commit_n_sha.split("\n")
+                            for (def cmt_id : commit_n) {
+                                println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")
+                                try {
+                                    stage("build_${cmt_id}") {
+                                        println("xxx")
+                                    }
+                                    println("---------------------------------------------------- GOT SUCESS: ${cmt_id}--------------------------------")
+                                    break;
+                                } catch (err) {
+                                    println("============================================================================catched failer, COMMIT_SHA: ${cmt_id}==========================================================")
+                                    println(err)
+                                }
+                            }
+                        }
                     }
                 }
             }

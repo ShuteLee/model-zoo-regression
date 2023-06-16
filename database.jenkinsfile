@@ -10,17 +10,8 @@ def query_latestes_build_sucess(case_name) {
 }
 
 def parse_profile(file_name) {
-    def csvFile = new File("${file_name}")
-    def csvReader = new CSVReader(csvFile.newReader())
-    def header = csvReader.readNext()
-    def data = []
-    while ((line = csvReader.readNext()) != null) {
-        def rowData = [:]
-        for (int i = 0; i < header.size(); i++) {
-            rowData[header[i]] = line[i]
-        }
-        data << rowData
-    }
+    def csvFile = readFile("${file_name}")
+    def data = csvFile.split("\n")
     println data
 }
 

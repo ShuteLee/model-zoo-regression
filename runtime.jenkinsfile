@@ -15,18 +15,14 @@ def sync_repository_gerrit(name) {
 }
 
 def sync_repostory(name, url) {
-    def rep_path = "${GIT_REPOSTORY_PATH}/" + name
     sh """#!/bin/bash
         set -e
-        mkdir -p "${GIT_REPOSTORY_PATH}"
-        if [ -d "${rep_path}" ]; then
-            pushd ${rep_path}
+        if [ -d "${name}" ]; then
+            pushd ${name}
             git pull && git submodule update
             popd
         else
-            pushd ${GIT_REPOSTORY_PATH}
             git clone ${url}
-            popd
         fi
     """
 }
@@ -37,7 +33,7 @@ pipeline {
         string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
     }
     agent {
-        label 'se7'
+        label 'linux-sc5-sc7'
     }
     environment {
         BMODEL_PATH = ""
@@ -52,18 +48,8 @@ pipeline {
         stage('CodeSync') {
             steps {
                 dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        rm -rf *
-                    """
                     sync_repository_github("model-zoo")
-                    script {
-                        sh """#!/bin/bash
-                            set -e
-                            git clone ${GIT_REPOSTORY_PATH}/model-zoo ${WORKSPACE}/model-zoo
-                            git clone https://github.com/QinyuZHAO0/blame-regression.git
-                        """
-                    }
+                    sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
                 }
             }
         }
@@ -75,7 +61,7 @@ pipeline {
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
                         sh """#!/bin/bash
                             set -e
-                            python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME}
+                            python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id 13
                         """
                     }
                 }

@@ -8,8 +8,7 @@ def query_latestes_build_sucess(case_name) {
 }
 
 def parse_profile(file_name) {
-    def csvFile = readFile("${file_name}")
-    def data = csvFile.split("\n")
+    def data = readCSV("${file_name}")
     println(data.getClass().toString())
     println data
 }

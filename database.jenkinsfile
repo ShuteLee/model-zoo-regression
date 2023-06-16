@@ -11,7 +11,8 @@ def parse_profile(file_name) {
     def records = readCSV file: "${file_name}", format: CSVFormat.DEFAULT.withHeader()
     println(records.getClass().toString())
     for (def d : records) {
-        println(d['name'] + " " + d['prec'] + " " + d['shape'])
+        
+        println(d['name'] + " " + d['prec'] + " " + d['shape'] + " " + d['gops'] + " " + d['mac_utilization'] + " " + d['ddr_utilization'] + " " + d['cpu_usage'])
     }
     println records
 }

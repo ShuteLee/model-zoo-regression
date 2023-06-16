@@ -15,18 +15,14 @@ def sync_repository_gerrit(name) {
 }
 
 def sync_repostory(name, url) {
-    def rep_path = "${GIT_REPOSTORY_PATH}/" + name
     sh """#!/bin/bash
         set -e
-        mkdir -p "${GIT_REPOSTORY_PATH}"
-        if [ -d "${rep_path}" ]; then
-            pushd ${rep_path}
+        if [ -d "${name}" ]; then
+            pushd ${name}
             git pull && git submodule update
             popd
         else
-            pushd ${GIT_REPOSTORY_PATH}
             git clone ${url}
-            popd
         fi
     """
 }
@@ -48,11 +44,7 @@ pipeline {
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
     }
     agent {
-        docker {
-            image 'sophgo/tpuc_dev'
-            args "-v /home/jenkins/git-repository:/git-repository"
-            label 'linux-sc5-sc7'
-        }
+        label 'linux-sc5-sc7'
     }
     environment {
         GIT_REPOSTORY_PATH = "/git-repository"
@@ -81,34 +73,16 @@ pipeline {
         stage('CodeSync') {
             steps {
                 dir("$WORKSPACE") {
-                    sh """#!/bin/bash
-                        set -e
-                        rm -rf *
-                    """
-                    // sync_repository_github("model-zoo")
                     script {
                         if (params.TOOLCHAIN == "nntoolchain") {
                             sync_repository_gerrit("libsophon")
                             sync_repository_gerrit("bm_prebuilt_toolchains")
                             sync_repository_gerrit("nntoolchain")
-                            sh """#!/bin/bash
-                                set -e
-                                ln -s ${GIT_REPOSTORY_PATH}/libsophon ${WORKSPACE}/libsophon
-                                ln -s ${GIT_REPOSTORY_PATH}/bm_prebuilt_toolchains ${WORKSPACE}/bm_prebuilt_toolchains
-                                git clone ${GIT_REPOSTORY_PATH}/nntoolchain ${WORKSPACE}/nntoolchain
-                            """
                         } else if (params.TOOLCHAIN == "tpu-mlir") {
                             sync_repository_gerrit("tpu-mlir")
-                            sh """#!/bin/bash
-                                set -e
-                                git clone ${GIT_REPOSTORY_PATH}/tpu-mlir ${WORKSPACE}/tpu-mlir
-                            """
                         }
-                        sh """#!/bin/bash
-                            set -e
-                            git clone "https://github.com/sophgo/model-zoo.git"
-                            git clone https://github.com/QinyuZHAO0/blame-regression.git
-                        """
+                        sync_repository_github("model-zoo")
+                        sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
                     }
                 }
             }

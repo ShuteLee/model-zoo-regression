@@ -67,6 +67,15 @@ pipeline {
         stage('Information') {
             steps {
                 println("case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}")
+                sh """#!/bin/bash
+                    set -e
+                    apt-get update
+                    apt-get install git -y
+                    apt-get install git-lfs -y
+                    apt-get install tree -y
+                    git config --unset core.hooksPath
+                    git lfs install --force
+                """
             }
         }
         stage('CodeSync') {
@@ -108,15 +117,6 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        sh """#!/bin/bash
-                            set -e
-                            apt-get update
-                            apt-get install git -y
-                            apt-get install git-lfs -y
-                            apt-get install tree -y
-                            git config --unset core.hooksPath
-                            git lfs install --force
-                        """
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             sh """#!/bin/bash
                                 set -e

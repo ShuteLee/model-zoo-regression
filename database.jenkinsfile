@@ -11,7 +11,7 @@ def parse_profile(file_name) {
     def data = readCSV file: "${file_name}"
     println(data.getClass().toString())
     for (def d : data) {
-        println(d)
+        println(d.toMap())
     }
     println data
 }

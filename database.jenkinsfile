@@ -90,7 +90,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        def latest_build_s = latestes_build_sucess(params.CASE_NAME)
+                        def latest_build_s = query_latestes_build_sucess(params.CASE_NAME)
                         println(latest_build_s)
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             sh """#!/bin/bash

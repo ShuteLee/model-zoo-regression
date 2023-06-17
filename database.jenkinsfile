@@ -1,4 +1,5 @@
 //===-*- Groovy -*-===
+import java.util.Random
 
 def sync_repository_github(name) {
     def url = "https://github.com/sophgo/${name}.git"
@@ -33,6 +34,67 @@ def query_latestes_build_sucess(case_name) {
         println("query results, latestes_build_sucess: ${results}")
         return results
     }
+}
+
+def print_database() {
+    getDatabaseConnection(type: 'GLOBAL') {
+        def results = sql(sql: "SELECT * FROM build_table;")
+        println("build_table: ${results}")
+    }
+    getDatabaseConnection(type: 'GLOBAL') {
+        def results = sql(sql: "SELECT * FROM runtime_table;")
+        println("runtime_table: ${results}")
+    }
+}
+
+// def insert_dummy_data() {
+//     def rand = new Random()
+//     def case_name_l = ['ppocr', 'mobilenet', 'resnet', 'resNext', 'yolo']
+//     def target_l = ['BM1684', 'BM1684X']
+//     def toolchain_l = ['nntoolchain', 'tpu-mlir']
+//     for (int i=0; i<10; i++) {
+//         def 
+//         getDatabaseConnection(type: 'GLOBAL') {
+//             def results = sql(sql: "INSERT INTO build_table (pipeline_id, commit_sha, case_name, build_status, toolchain, target, build_time, runtime_id, date) VALUES ();")
+//         }
+//     }
+// }
+
+def insert_build_data(data) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        sql(sql: "INSERT INTO build_table (pipeline_id, commit_sha, case_name, build_status, toolchain, target, build_time, runtime_id, date) VALUES (${data['pipeline_id']}, ${data['commit_sha']}, ${data['case_name']}, ${data['build_status']}, ${data['toolchain']}, ${data['target']}, ${data['build_time']}, ${data['runtime_id']}, ${data['date']});")
+        return sql(sql: "SELECT LAST_INSERT_BUILD_ID()")
+    }
+}
+
+def update_runtime_id_in_build(build_id, runtime_id) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        sql(sql: "UPDATE build_table SET runtime_id=${runtime_id} WHERE build_id=${build_id};")
+    }
+}
+
+def insert_runtime_data() {
+    getDatabaseConnection(type: 'GLOBAL') {
+        sql(sql: "INSERT INTO runtime_table (runtime_status, target, name, dyn, opt, prec, shape, gops, time, mac_utiliz, ddr_utiliz, cpu_usage, device_id, driver_version, date) VALUES (${data['runtime_status']}, ${data['target']}, ${data['name']}, ${data['dyn']}, ${data['opt']}, ${data['prec']}, ${data['shape']}, ${data['gops']}, ${data['time']}, ${data['mac_utiliz']}, ${data['ddr_utiliz']}, ${data['cpu_usage']}, ${data['device_id']}, ${data['driver_version']}, ${data['date']});")
+        return sql(sql: "SELECT LAST_RUNTIME_ID()")
+    }
+}
+
+def gen_dummy_build_data(pipeline_id, commit_sha, date) {
+    def dummy_toolchains = ['nntoolchain', 'tpu-mlir']
+    def dummy_targets = ['BM1684', 'BM1684X']
+    def dummy_names = ['yolo', 'mobile_net', 'maskrcnn', 'ppocr', 'resnet']
+    def rand = New Random()
+    return ['pipeline_id':pipeline_id, 'commit_sha':commit_sha, 'case_name':dummy_names[rand.nextInt(5)], 'build_status':rand.nextInt(2), 'toolchain':dummy_toolchains[rand.nextInt(2)], 'target':dummy_targets[rand.nextInt(2)], 'build_time':rand.nextDouble()*10, 'runtime_id':0, 'date':data]
+}
+
+def gen_dummy_runtime_data(pipeline_id, date) {
+    def dummy_toolchains = ['nntoolchain', 'tpu-mlir']
+    def dummy_targets = ['BM1684', 'BM1684X']
+    def dummy_names = ['yolo', 'mobile_net', 'maskrcnn', 'ppocr', 'resnet']
+    def dummy_shapes = ['1x3x224x224', '4x3x64x128', '1x3x640x640', '1x3x64x128', '1x3x320x640']
+    def rand = New Random()
+    return ['pipeline_id':pipeline_id, 'runtime_status':rand.nextInt(2), 'target':dummy_targets[rand.nextInt(2)], 'name':dummy_names[rand.nextInt(5)], 'dyn':rand.nextInt(2), 'opt':rand.nextInt(3), 'prec':rand.nextDouble(), 'shape':dummy_shapes[rand.nextInt(5)], 'gops':rand.nextDouble()*10, 'time':rand.nextDouble()*100, 'mac_utiliz':rand.nextDouble(), 'ddr_utiliz':rand.nextDouble(), 'cpu_usage':rand.nextDouble(), 'device_id':rand.nextInt(10), 'driver_version':'20220402_dailybuild_a3dfsdg', 'date':date]
 }
 
 pipeline {
@@ -83,6 +145,14 @@ pipeline {
                         sync_repository_github("model-zoo")
                         sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
                     }
+                    def lss = sh(script: "tree -L 2", returnStdout: true)
+                    println(lss)
+                }
+                dir("${WORKSPACE}/blame-regression/test") {
+                    sh """#!/bin/bash
+                        set -e
+                        pip3 install -r requirements.txt
+                    """
                 }
             }
         }
@@ -90,41 +160,28 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        def latest_build_s = query_latestes_build_sucess(params.CASE_NAME)
-                        println(latest_build_s)
-                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
-                            sh """#!/bin/bash
-                                set -e
-                                git reset --hard ${params.COMMIT_SHA}
-                            """
-                        }
-                        dir("${WORKSPACE}/blame-regression/test") {
-                            sh """#!/bin/bash
-                                set -e
-                                pip3 install -r requirements.txt
-                            """
-                        }
-                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
-                            def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
-                            println(commit_n_sha)
-                            dir("${WORKSPACE}") {
-                                def lss = sh(script: "tree -L 2", returnStdout: true)
-                                println(lss)
+                        def rand = New Random()
+                        def pipeline_id = ${BUILD_ID}
+                        def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 30 --pretty=format:\"%h\"''', returnStdout: true)
+                        for (int i=0; i<10; i++) {
+                            println("============================================= $i =====================================")
+                            def cmt_id = commit_n_sha[rand.nextInt(30)]
+                            def current_time = new Date(currentTime())
+                            def simple_date_format = new SimpleDateFormat("yyyy-MM-dd")
+                            def date = simple_date_format.format(current_time)
+                            def build_res = gen_dummy_build_data(pipeline_id, cmt_id, date)
+                            if (build_res['build_status'] == 0) {
+                                println("--------catch first sucess : ${build_res}----------")
+                                def build_id = insert_build_data(build_res)
+                                def runtime_res = gen_dummy_runtime_data(pipeline_id, date)
+                                println("------runtime : ${runtime_res}--------")
+                                def runtime_id = insert_runtime_data(runtime_res)
+                                update_runtime_id_in_build(build_id, runtime_id)
+                            } else {
+                                println("--------catch failer : ${build_res}----------")
+                                def build_id = insert_build_data(build_res)
                             }
-                            def commit_n = commit_n_sha.split("\n")
-                            for (def cmt_id : commit_n) {
-                                println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")
-                                try {
-                                    stage("build_${cmt_id}") {
-                                        println("xxx")
-                                    }
-                                    println("---------------------------------------------------- GOT SUCESS: ${cmt_id}--------------------------------")
-                                    break;
-                                } catch (err) {
-                                    println("============================================================================catched failer, COMMIT_SHA: ${cmt_id}==========================================================")
-                                    println(err)
-                                }
-                            }
+                            print_database()
                         }
                     }
                 }

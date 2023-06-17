@@ -157,7 +157,9 @@ pipeline {
                     script {
                         println("--- process start ---")
                         def rand = new Random()
+                        println("--xx--")
                         def pipeline_id = ${BUILD_ID}
+                        println("--xxx--")
                         def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 30 --pretty=format:\"%h\"''', returnStdout: true)
                         for (int i=0; i<10; i++) {
                             println("============================================= $i =====================================")

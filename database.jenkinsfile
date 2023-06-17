@@ -139,9 +139,9 @@ pipeline {
                         }
                         sync_repository_github("model-zoo")
                         sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
+                        def lss = sh(script: "tree -L 2", returnStdout: true)
+                        println(lss)
                     }
-                    def lss = sh(script: "tree -L 2", returnStdout: true)
-                    println(lss)
                 }
                 dir("${WORKSPACE}/blame-regression/test") {
                     sh """#!/bin/bash

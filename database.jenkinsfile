@@ -1,5 +1,7 @@
 //===-*- Groovy -*-===
 import java.util.Random
+import java.text.SimpleDateFormat
+import java.util.Time
 
 def sync_repository_github(name) {
     def url = "https://github.com/sophgo/${name}.git"
@@ -163,7 +165,11 @@ pipeline {
                             def current_time = new Date(currentTime())
                             def simple_date_format = new SimpleDateFormat("yyyy-MM-dd")
                             def date = simple_date_format.format(current_time)
+                            def startTime = time()
                             def build_res = gen_dummy_build_data(pipeline_id, cmt_id, date)
+                            def endTime = time()
+                            def duringTime = endTime - startTime
+                            println("during time: ${duringTime}")
                             if (build_res['build_status'] == 0) {
                                 println("--------catch first sucess : ${build_res}----------")
                                 def build_id = insert_build_data(build_res)

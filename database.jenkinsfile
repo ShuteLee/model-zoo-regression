@@ -71,13 +71,13 @@ def insert_build_data(data) {
 
 def update_runtime_id_in_build(build_id, runtime_id) {
     getDatabaseConnection(type: 'GLOBAL') {
-        sql(sql: "UPDATE build_table SET runtime_id=${runtime_id} WHERE build_id=${build_id};")
+        sql(sql: "UPDATE build_table SET runtime_id=${runtime_id} WHERE id=${build_id};")
     }
 }
 
 def insert_runtime_data() {
     getDatabaseConnection(type: 'GLOBAL') {
-        sql(sql: "INSERT INTO runtime_table (pipeline_id, runtime_status, target, name, dyn, opt, prec, shape, gops, time, mac_utiliz, ddr_utiliz, cpu_usage, device_id, driver_version, date) VALUES (${data['pipeline_id']}, ${data['runtime_status']}, \"${data['target']}\", \"${data['name']}\", ${data['dyn']}, ${data['opt']}, ${data['prec']}, \"${data['shape']}\", ${data['gops']}, ${data['time']}, ${data['mac_utiliz']}, ${data['ddr_utiliz']}, ${data['cpu_usage']}, ${data['device_id']}, \"${data['driver_version']}\", \"${data['date']}\");")
+        sql(sql: "INSERT INTO runtime_table (pipeline_id, build_id, runtime_status, target, name, dyn, opt, prec, shape, gops, time, mac_utiliz, ddr_utiliz, cpu_usage, device_id, driver_version, date) VALUES (${data['pipeline_id']}, ${data['build_id']}, ${data['runtime_status']}, \"${data['target']}\", \"${data['name']}\", ${data['dyn']}, ${data['opt']}, ${data['prec']}, \"${data['shape']}\", ${data['gops']}, ${data['time']}, ${data['mac_utiliz']}, ${data['ddr_utiliz']}, ${data['cpu_usage']}, ${data['device_id']}, \"${data['driver_version']}\", \"${data['date']}\");")
         return sql(sql: "SELECT LAST_RUNTIME_ID()")
     }
 }
@@ -87,7 +87,7 @@ def gen_dummy_build_data(pipeline_id, commit_sha, date) {
     def dummy_targets = ['BM1684', 'BM1684X']
     def dummy_names = ['yolo', 'mobile_net', 'maskrcnn', 'ppocr', 'resnet']
     def rand = new Random()
-    return ['pipeline_id':pipeline_id, 'commit_sha':commit_sha, 'case_name':dummy_names[rand.nextInt(5)], 'build_status':rand.nextInt(2), 'toolchain':dummy_toolchains[rand.nextInt(2)], 'target':dummy_targets[rand.nextInt(2)], 'build_time':rand.nextDouble()*10, 'runtime_id':0, 'date':date]
+    return ['pipeline_id':pipeline_id, 'commit_sha':commit_sha, 'case_name':dummy_names[rand.nextInt(5)], 'build_status':rand.nextInt(2), 'toolchain':dummy_toolchains[rand.nextInt(2)], 'target':dummy_targets[rand.nextInt(2)], 'build_time':rand.nextDouble()*10, 'runtime_id':-1, 'date':date]
 }
 
 def gen_dummy_runtime_data(pipeline_id, date) {
@@ -96,7 +96,7 @@ def gen_dummy_runtime_data(pipeline_id, date) {
     def dummy_names = ['yolo', 'mobile_net', 'maskrcnn', 'ppocr', 'resnet']
     def dummy_shapes = ['1x3x224x224', '4x3x64x128', '1x3x640x640', '1x3x64x128', '1x3x320x640']
     def rand = new Random()
-    return ['pipeline_id':pipeline_id, 'runtime_status':rand.nextInt(2), 'target':dummy_targets[rand.nextInt(2)], 'name':dummy_names[rand.nextInt(5)], 'dyn':rand.nextInt(2), 'opt':rand.nextInt(3), 'prec':rand.nextDouble(), 'shape':dummy_shapes[rand.nextInt(5)], 'gops':rand.nextDouble()*10, 'time':rand.nextDouble()*100, 'mac_utiliz':rand.nextDouble(), 'ddr_utiliz':rand.nextDouble(), 'cpu_usage':rand.nextDouble(), 'device_id':rand.nextInt(10), 'driver_version':'20220402_dailybuild_a3dfsdg', 'date':date]
+    return ['pipeline_id':pipeline_id, 'build_id':-1, 'runtime_status':rand.nextInt(2), 'target':dummy_targets[rand.nextInt(2)], 'name':dummy_names[rand.nextInt(5)], 'dyn':rand.nextInt(2), 'opt':rand.nextInt(3), 'prec':rand.nextDouble(), 'shape':dummy_shapes[rand.nextInt(5)], 'gops':rand.nextDouble()*10, 'time':rand.nextDouble()*100, 'mac_utiliz':rand.nextDouble(), 'ddr_utiliz':rand.nextDouble(), 'cpu_usage':rand.nextDouble(), 'device_id':rand.nextInt(10), 'driver_version':'20220402_dailybuild_a3dfsdg', 'date':date]
 }
 
 pipeline {

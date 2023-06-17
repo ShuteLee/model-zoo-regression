@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `build_table`(
-   `build_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `pipeline_id` INT UNSIGNED NOT NULL,
    `commit_sha` VARCHAR(40) NOT NULL,
    `case_name` VARCHAR(40) NOT NULL,
@@ -8,12 +8,13 @@ CREATE TABLE IF NOT EXISTS `build_table`(
    `target` VARCHAR(20) NOT NULL,
    `build_time` DOUBLE,
    `runtime_id` INT UNSIGNED,
-   `date` DATE,
-   CONSTRAINT fk_build_runtime FOREIGN KEY(`runtime_id`) REFERENCES runtime_table(`runtime_id`)
+   `date` DATE
 );
 
 CREATE TABLE IF NOT EXISTS `runtime_table`(
-   `runtime_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   `pipeline_id` INT UNSIGNED,
+   `build_id` INT,
    `runtime_status` INT NOT NULL,
    `target` VARCHAR(20),
    `name` VARCHAR(40),

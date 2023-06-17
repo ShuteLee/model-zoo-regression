@@ -87,7 +87,7 @@ def gen_dummy_build_data(pipeline_id, commit_sha, date) {
     def dummy_targets = ['BM1684', 'BM1684X']
     def dummy_names = ['yolo', 'mobile_net', 'maskrcnn', 'ppocr', 'resnet']
     def rand = new Random()
-    return ['pipeline_id':pipeline_id, 'commit_sha':commit_sha, 'case_name':dummy_names[rand.nextInt(5)], 'build_status':rand.nextInt(2), 'toolchain':dummy_toolchains[rand.nextInt(2)], 'target':dummy_targets[rand.nextInt(2)], 'build_time':rand.nextDouble()*10, 'runtime_id':0, 'date':data]
+    return ['pipeline_id':pipeline_id, 'commit_sha':commit_sha, 'case_name':dummy_names[rand.nextInt(5)], 'build_status':rand.nextInt(2), 'toolchain':dummy_toolchains[rand.nextInt(2)], 'target':dummy_targets[rand.nextInt(2)], 'build_time':rand.nextDouble()*10, 'runtime_id':0, 'date':date]
 }
 
 def gen_dummy_runtime_data(pipeline_id, date) {

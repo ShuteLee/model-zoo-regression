@@ -168,6 +168,7 @@ pipeline {
                             def date = new Date().format("yyyy-MM-dd", TimeZone.getTimeZone('UTC'))
                             def startTime = new Date().getTime()
                             def build_res = gen_dummy_build_data(pipeline_id, cmt_id, date)
+                            println("build_res: ${build_res}")
                             def endTime = new Date().getTime()
                             def duringTime = endTime - startTime
                             println("during time: ${duringTime}")

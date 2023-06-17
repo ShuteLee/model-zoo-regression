@@ -1,7 +1,6 @@
 //===-*- Groovy -*-===
 import java.util.Random
 import java.text.SimpleDateFormat
-import java.util.Time
 
 def sync_repository_github(name) {
     def url = "https://github.com/sophgo/${name}.git"

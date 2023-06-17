@@ -65,7 +65,7 @@ def print_database() {
 def insert_build_data(data) {
     getDatabaseConnection(type: 'GLOBAL') {
         sql(sql: "INSERT INTO build_table (pipeline_id, commit_sha, case_name, build_status, toolchain, target, build_time, runtime_id, date) VALUES (${data['pipeline_id']}, \"${data['commit_sha']}\", \"${data['case_name']}\", ${data['build_status']}, \"${data['toolchain']}\", \"${data['target']}\", ${data['build_time']}, ${data['runtime_id']}, \"${data['date']}\");")
-        return sql(sql: "SELECT LAST_INSERT_ID() from build_table")
+        return sql(sql: "SELECT LAST_INSERT_ID() from build_table;")
     }
 }
 
@@ -75,10 +75,10 @@ def update_runtime_id_in_build(build_id, runtime_id) {
     }
 }
 
-def insert_runtime_data() {
+def insert_runtime_data(data) {
     getDatabaseConnection(type: 'GLOBAL') {
         sql(sql: "INSERT INTO runtime_table (pipeline_id, build_id, runtime_status, target, name, dyn, opt, prec, shape, gops, time, mac_utiliz, ddr_utiliz, cpu_usage, device_id, driver_version, date) VALUES (${data['pipeline_id']}, ${data['build_id']}, ${data['runtime_status']}, \"${data['target']}\", \"${data['name']}\", ${data['dyn']}, ${data['opt']}, ${data['prec']}, \"${data['shape']}\", ${data['gops']}, ${data['time']}, ${data['mac_utiliz']}, ${data['ddr_utiliz']}, ${data['cpu_usage']}, ${data['device_id']}, \"${data['driver_version']}\", \"${data['date']}\");")
-        return sql(sql: "SELECT LAST_INSERT_ID() from runtime_table")
+        return sql(sql: "SELECT LAST_INSERT_ID() from runtime_table;")
     }
 }
 

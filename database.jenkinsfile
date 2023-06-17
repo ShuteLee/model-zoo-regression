@@ -98,12 +98,6 @@ def gen_dummy_runtime_data(pipeline_id, date) {
 }
 
 pipeline {
-    parameters {
-        string(name: 'CASE_NAME', defaultValue: '', description: 'Case name of a single case.')
-        string(name: 'TOOLCHAIN', defaultValue: '', description: 'NNTC/TPU-MLIR')
-        string(name: 'TARGET', defaultValue: '', description: 'BM1684/BM1684X')
-        string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
-    }
     agent {
         label 'linux-sc5-sc7'
     }
@@ -119,7 +113,7 @@ pipeline {
     stages {
         stage('Information') {
             steps {
-                println("case name: ${params.CASE_NAME}, toolchain selected: ${params.TOOLCHAIN}, target selected: ${params.TARGET}, toolchain version: ${params.COMMIT_SHA}")
+                println("----hello world----")
                 sh """#!/bin/bash
                     set -e
                     apt-get update

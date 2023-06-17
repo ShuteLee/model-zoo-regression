@@ -155,7 +155,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        def rand = New Random()
+                        def rand = new Random()
                         def pipeline_id = ${BUILD_ID}
                         def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 30 --pretty=format:\"%h\"''', returnStdout: true)
                         for (int i=0; i<10; i++) {

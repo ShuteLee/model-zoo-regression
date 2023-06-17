@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `build_table`(
    `toolchain` VARCHAR(20) NOT NULL,
    `target` VARCHAR(20) NOT NULL,
    `build_time` DOUBLE,
-   `runtime_id` INT UNSIGNED,
+   `runtime_id` INT,
    `date` DATE
 );
 

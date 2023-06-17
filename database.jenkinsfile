@@ -163,6 +163,7 @@ pipeline {
                         println("--xxx--")
                         def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 30 --pretty=format:\"%h\"''', returnStdout: true)
                         def commit_n = commit_n_sha.split("\n")
+                        println(commit_n)
                         for (int i=0; i<10; i++) {
                             println("============================================= $i =====================================")
                             def cmt_id = commit_n[rand.nextInt(30)]

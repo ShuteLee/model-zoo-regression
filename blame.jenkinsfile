@@ -153,6 +153,7 @@ pipeline {
                                 println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_sha}=======================***********************==================")
                                 def date = new Date().format("yyyy-MM-dd")
                                 def startTime = new Date().getTime()
+                                def build_status = -1
                                 def runtime_id = -1
                                 try {
                                     stage("build_${cmt_sha}") {
@@ -163,6 +164,8 @@ pipeline {
                                             """
                                         }
                                     }
+                                    println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")
+                                    build_status = 0
                                     // runtiem process
                                     def runtime_job = build job: 'runtime', parameters: [
                                             string(name: 'CASE_NAME', value: params.CASE_NAME),
@@ -178,7 +181,7 @@ pipeline {
                                 } finally {
                                     def endTime = new Date().getTime()
                                     def duringTime = endTime - startTime
-                                    def build_res = ['pipeline_id':"${BUILD_ID}", 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':0, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
+                                    def build_res = ['pipeline_id':"${BUILD_ID}", 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':build_status, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
                                     def build_id = insert_build_data(build_res)
                                     update_runtime_id_in_build(build_id, runtime_id)
                                 }

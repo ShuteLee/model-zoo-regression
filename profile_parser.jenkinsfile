@@ -1,0 +1,34 @@
+//===-*- Groovy -*-===
+
+def parse_profile(path) {
+    def records = readCSV(file: path, format: CSVFormat.DEFAULT.withHeader())
+    println(records)
+    def data_maps = []
+    for (def record : records) {
+        data_maps.add(record.toMap())
+    }
+    return data_maps
+}
+
+pipeline {
+    agent {
+        label 'linux-sc5-sc7'
+    }
+    stages {
+        stage('Information') {
+            steps {
+                println("start profile parsing...")
+            }
+        }
+        stage('Process') {
+            steps {
+                dir("$WORKSPACE") {
+                    script {
+                        def res = parse_profile("stats.csv")
+                        println(res)
+                    }
+                }
+            }
+        }
+    }
+}

@@ -89,8 +89,12 @@ pipeline {
                         try {
                             sh """#!/bin/bash
                                 set -e
-                                python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id ${device_id}
+                                python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --devices ${device_id}
                             """
+                            dir("${WORKSPACE}/model-zoo") {
+                                def l2tree = sh(script: "tree -L 3", returnStdout: true).trim()
+                                println("L2 working tree: ${l2tree}")
+                            }
                             // parse_profile("$WORKSPACE")
                             println("runtime sucess")
                         } catch (err) {

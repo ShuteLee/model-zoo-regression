@@ -145,6 +145,8 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
+                        def latest_sucess = query_latestes_build_sucess(params.CASE_NAME)
+                        println("latest sucess sha: ${latest_sucess}")
                         println("--- process start ---")
                         def rand = new Random()
                         println("--xx--")

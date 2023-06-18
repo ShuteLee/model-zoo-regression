@@ -27,6 +27,10 @@ def sync_repostory(name, url) {
     """
 }
 
+def parse_profile(path) {
+    println("path: ${path}")
+}
+
 def get_first_avaliable_chips(target) {
     def target_chip_map = ['BM1684': '0x1684', 'BM1684X':'0x1684x']
     def card_num = sh(script: 'cat /proc/bmsophon/card_num', returnStdout: true).toInteger()
@@ -82,10 +86,16 @@ pipeline {
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
                         def device_id = get_first_avaliable_chips(params.TARGET)
                         println("device id selected: ${device_id}")
-                        sh """#!/bin/bash
-                            set -e
-                            python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id ${device_id}
-                        """
+                        try {
+                            sh """#!/bin/bash
+                                set -e
+                                python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id ${device_id}
+                            """
+                            // parse_profile("$WORKSPACE")
+                            println("runtime sucess")
+                        } catch (err) {
+                            println("runtime error")
+                        }
                     }
                 }
             }

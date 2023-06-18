@@ -1,5 +1,8 @@
 //===-*- Groovy -*-===
 
+/*
+    sync code releated
+*/
 def sync_repository_github(name) {
     def url = "https://github.com/sophgo/${name}.git"
     println("sync the latest codes")
@@ -27,14 +30,50 @@ def sync_repostory(name, url) {
     """
 }
 
-// def query_latestes_build_sucess(case_name) {
-//     def results
-//     getDatabaseConnection(type: 'GLOBAL') {
-//         results = sql(sql: "SELECT cmt_id FROM build_table WHERE case_name=${case_name} ORDER BY DESC LIMIT 1")
-//         println("items: ${results}")
-//     }
-//     return results
-// }
+/*
+    database releated
+*/
+def query_latestes_build_sucess(case_name) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        def results = sql(sql: "SELECT commit_sha FROM build_table WHERE case_name=\"${case_name}\" AND build_status=0 ORDER BY id DESC LIMIT 1;")[0]
+        println("query results, latestes_build_sucess: ${results}")
+        return results
+    }
+}
+
+def insert_build_data(data) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        sql(sql: "INSERT INTO build_table (pipeline_id, commit_sha, case_name, build_status, toolchain, target, build_time, runtime_id, date) VALUES (${data['pipeline_id']}, \"${data['commit_sha']}\", \"${data['case_name']}\", ${data['build_status']}, \"${data['toolchain']}\", \"${data['target']}\", ${data['build_time']}, ${data['runtime_id']}, \"${data['date']}\");")
+        def res = sql(sql: "SELECT LAST_INSERT_ID()")
+        return res[0]['LAST_INSERT_ID()']
+    }
+}
+
+def insert_runtime_data(data) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        sql(sql: "INSERT INTO runtime_table (pipeline_id, build_id, runtime_status, target, name, dyn, opt, prec, shape, gops, time, mac_utiliz, ddr_utiliz, cpu_usage, device_id, driver_version, date) VALUES (${data['pipeline_id']}, ${data['build_id']}, ${data['runtime_status']}, \"${data['target']}\", \"${data['name']}\", ${data['dyn']}, ${data['opt']}, ${data['prec']}, \"${data['shape']}\", ${data['gops']}, ${data['time']}, ${data['mac_utiliz']}, ${data['ddr_utiliz']}, ${data['cpu_usage']}, ${data['device_id']}, \"${data['driver_version']}\", \"${data['date']}\");")
+        def res = sql(sql: "SELECT LAST_INSERT_ID()")
+        return res[0]['LAST_INSERT_ID()']
+    }
+}
+
+def update_runtime_id_in_build(build_id, runtime_id) {
+    getDatabaseConnection(type: 'GLOBAL') {
+        sql(sql: "UPDATE build_table SET runtime_id=${runtime_id} WHERE id=${build_id};")
+    }
+}
+
+def print_database() {
+    getDatabaseConnection(type: 'GLOBAL') {
+        def results = sql(sql: "SELECT * FROM build_table;")
+        println("build_table: ${results}")
+    }
+    getDatabaseConnection(type: 'GLOBAL') {
+        def results = sql(sql: "SELECT * FROM runtime_table;")
+        println("runtime_table: ${results}")
+    }
+}
+
 
 pipeline {
     parameters {
@@ -54,6 +93,7 @@ pipeline {
         FTP_SERVER = "ftp://AI:SophgoRelease2022@172.28.141.89"
         SWAP_SERVER = "http://172.28.142.120/webdav/swap"
         OUTPUT_TMP = "/tmp/dummy.github.output.txt"
+        MAX_BLAME_DEPTH = 30
     }
     stages {
         stage('Information') {
@@ -84,6 +124,14 @@ pipeline {
                         sync_repository_github("model-zoo")
                         sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
                     }
+                    def l2tree = sh(script: "tree -L 2", returnStdout: true).trim()
+                    println("L2 working tree: ${l2tree}")
+                }
+                dir("${WORKSPACE}/blame-regression/test") {
+                    sh """#!/bin/bash
+                        set -e
+                        pip3 install -r requirements.txt
+                    """
                 }
             }
         }
@@ -91,54 +139,45 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
+                        def latest_sucess = query_latestes_build_sucess(params.CASE_NAME)
+                        println("--- found latest sucess sha: ${latest_sucess} ---")
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
-                            sh """#!/bin/bash
-                                set -e
-                                git reset --hard ${params.COMMIT_SHA}
-                            """
-                        }
-                        dir("${WORKSPACE}/blame-regression/test") {
-                            sh """#!/bin/bash
-                                set -e
-                                pip3 install -r requirements.txt
-                            """
-                        }
-                        dir("${WORKSPACE}/${params.TOOLCHAIN}") {
-                            def commit_n_sha = sh(script: '''git log  --pretty=oneline -n 6 --pretty=format:\"%h\"''', returnStdout: true)
-                            println(commit_n_sha)
-                            dir("${WORKSPACE}") {
-                                def lss = sh(script: "tree -L 2", returnStdout: true)
-                                println(lss)
+                            def commit_shas = []
+                            if (latest_sucess.isEmpty()) {
+                                commit_shas = sh(script: "git log ${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
+                            } else {
+                                commit_shas = sh(script: "git log ${latest_sucess}..${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
                             }
-                            // getDatabaseConnection(type: 'GLOBAL') {
-                            //     def result = sql(sql: "show databases;")
-                            //     println "Class of result: ${result.getClass().toString()}"
-                            //     println "Value of result: ${result}"
-                            //     def items = sql(sql: "select * from build_table")
-                            //     println("items: ${items}")
-                            // }
-                            def commit_n = commit_n_sha.split("\n")
-                            for (def cmt_id : commit_n) {
-                                println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_id}=======================***********************==================")
+                            println("Blamming commit_shas: ${commit_shas}")
+                            for (def cmt_sha : commit_shas.split("\n")) {
+                                println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_sha}=======================***********************==================")
                                 try {
-                                    stage("build_${cmt_id}") {
+                                    def date = new Date().format("yyyy-MM-dd")
+                                    def startTime = new Date().getTime()
+                                    stage("build_${cmt_sha}") {
                                         dir ("${WORKSPACE}/blame-regression") {
                                             sh """#!/bin/bash
                                                 set -e
-                                                python3 -m pytest test -m "mlir and build" --target=${params.TARGET} --commit_id ${cmt_id} --case_name ${params.CASE_NAME}
+                                                python3 -m pytest test -m "mlir and build" --target=${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
                                             """
                                         }
                                     }
-                                    def b = build job: 'runtime', parameters: [
+                                    def endTime = new Date().getTime()
+                                    def duringTime = endTime - startTime
+                                    def build_res = ['pipeline_id':${BUILD_ID}, 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':0, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
+                                    def build_id = insert_build_data(build_res)
+                                    // runtiem process
+                                    def runtime_job = build job: 'runtime', parameters: [
                                             string(name: 'CASE_NAME', value: params.CASE_NAME),
                                             string(name: 'TARGET', value: params.TARGET)
                                             ], wait: true, propagate: false
-                                    def varb = b.getResult()
-                                    println(varb)
-                                    println("---------------------------------------------------- GOT SUCESS: ${cmt_id}--------------------------------")
+                                    runtime_id = runtime_job.getId()
+                                    update_runtime_id_in_build(build_id, runtime_id)
+                                    println("runtime status: ${runtime_job.getResult()}")
+                                    println("---------------------------------------------------- GOT SUCESS: ${cmt_sha}--------------------------------")
                                     break;
                                 } catch (err) {
-                                    println("============================================================================catched failer, COMMIT_SHA: ${cmt_id}==========================================================")
+                                    println("============================================================================catched failer, COMMIT_SHA: ${cmt_sha}==========================================================")
                                     println(err)
                                 }
                             }

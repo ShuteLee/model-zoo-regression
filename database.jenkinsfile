@@ -68,6 +68,7 @@ def insert_build_data(data) {
         println(res)
         def id = sql(sql: "SELECT LAST_INSERT_ID()")
         println(id)
+        println(id.getClass().toString())
         return id
     }
 }
@@ -84,6 +85,7 @@ def insert_runtime_data(data) {
         println(res)
         def id = sql(sql: "SELECT LAST_INSERT_ID()")
         println(id)
+        println(id.getClass().toString())
         return id
     }
 }

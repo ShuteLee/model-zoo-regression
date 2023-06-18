@@ -160,7 +160,7 @@ pipeline {
                                         dir ("${WORKSPACE}/blame-regression") {
                                             sh """#!/bin/bash
                                                 set -e
-                                                python3 -m pytest test -m "mlir and build" --target=${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
+                                                python3 -m pytest test -m "mlir and build" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
                                             """
                                         }
                                     }

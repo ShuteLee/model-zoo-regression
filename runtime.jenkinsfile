@@ -91,7 +91,7 @@ pipeline {
                             try {
                                 sh """#!/bin/bash
                                     set -e
-                                    python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME}
+                                    python3 -m pytest test -m "mlir and runtime" --target ${params.TARGET} --case_name ${params.CASE_NAME}
                                 """
                                 dir("${WORKSPACE}/model-zoo") {
                                     def l2tree = sh(script: "tree -L 3", returnStdout: true).trim()

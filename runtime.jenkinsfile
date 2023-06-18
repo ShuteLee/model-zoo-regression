@@ -32,7 +32,7 @@ def get_first_avaliable_chips(target) {
     def card_num = sh(script: 'cat /proc/bmsophon/card_num', returnStdout: true)
     println("card_num: ${card_num}")
     for (int i=0; i<card_num; i++) {
-        def chipid = sh(script: "cat /proc/bmsophon/card${i}/chipid", returnStdout: true)
+        string chipid = sh(script: "cat /proc/bmsophon/card${i}/chipid", returnStdout: true)
         println("chipid: ${chipid}")
         if (target_chip_map[target] == chipid) {
             def avaliable_idxs = sh(script: "ls /proc/bmsophon/card3 | grep \"^bmsophon[0-9]*\$\" | sed 's/bmsophon\\([0-9]*\\)/\\1/'", returnStdout: true).split('\n')

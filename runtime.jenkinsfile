@@ -38,7 +38,7 @@ def get_first_avaliable_chips(target) {
             def avaliable_idxs = sh(script: "ls /proc/bmsophon/card${i} | grep \"^bmsophon[0-9]*\$\" | sed 's/bmsophon\\([0-9]*\\)/\\1/'", returnStdout: true).trim().split('\n')
             println("avaliable_idxs: ${avaliable_idxs}")
             for (def avaliable_idx : avaliable_idxs) {
-                def chip_status = sh(script: "cat /proc/bmsophon/card${i}/bmsophon${avaliable_idx}/status", returnStdout: true)
+                def chip_status = sh(script: "cat /proc/bmsophon/card${i}/bmsophon${avaliable_idx}/status", returnStdout: true).trim()
                 println("avaliable_idx: ${avaliable_idx}, status: ${chip_status}")
                 if (chip_status == "Active") {
                     return avaliable_idx;

@@ -1,3 +1,6 @@
+/*
+   build_status 0: SUCESS 1:FAIL
+*/
 CREATE TABLE IF NOT EXISTS `build_table`(
    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `pipeline_id` INT UNSIGNED NOT NULL,
@@ -11,6 +14,9 @@ CREATE TABLE IF NOT EXISTS `build_table`(
    `date` DATE
 );
 
+/*
+   runtime_status 0: SUCESS 1:FAIL
+*/
 CREATE TABLE IF NOT EXISTS `runtime_table`(
    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `pipeline_id` INT UNSIGNED,

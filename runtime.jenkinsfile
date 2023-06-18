@@ -27,6 +27,24 @@ def sync_repostory(name, url) {
     """
 }
 
+def get_first_avaliable_chips(target) {
+    def target_chip_map = ['BM1684': '0x1684', 'BM1684X':'0x1684x']
+    def card_num = sh(script: 'cat /proc/bmsophon/card_num', returnStatus: true)
+    for (int i=0; i<card_num; i++) {
+        def chipid = sh(script: "cat /proc/bmsophon/card${i}/chipid", returnStatus: true)
+        if (target_chip_map[target] == chipid) {
+            def avaliable_idxs = sh(script: "ls /proc/bmsophon/card3 | grep \"^bmsophon[0-9]*$\" | sed 's/bmsophon\\([0-9]*\\)/\\1/'", returnStatus: true).split('\n')
+            for (def avaliable_idx : avaliable_idxs) {
+                def chip_status = sh(script: "cat /proc/bmsophon/card${i}/bmsophon${avaliable_idx}/status", returnStatus: true)
+                if (chip_status == "Active") {
+                    return avaliable_idx;
+                }
+            }
+        }
+    }
+    return -1;
+}
+
 pipeline {
     parameters {
         string(name: 'CASE_NAME', defaultValue: '', description: 'Case name of a single case.')
@@ -37,7 +55,6 @@ pipeline {
     }
     environment {
         BMODEL_PATH = ""
-        GIT_REPOSTORY_PATH = "/git-repository"
     }
     stages {
         stage('Information') {
@@ -59,10 +76,12 @@ pipeline {
                     script {
                         println("runtime start.....")
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
-                        sh """#!/bin/bash
-                            set -e
-                            python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id 13
-                        """
+                        // sh """#!/bin/bash
+                        //     set -e
+                        //     python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id 13
+                        // """
+                        def device_id = get_first_avaliable_chips(params.TARGET)
+                        println("device_id: ${device_id}")
                     }
                 }
             }

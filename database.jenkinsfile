@@ -49,19 +49,6 @@ def print_database() {
     }
 }
 
-// def insert_dummy_data() {
-//     def rand = new Random()
-//     def case_name_l = ['ppocr', 'mobilenet', 'resnet', 'resNext', 'yolo']
-//     def target_l = ['BM1684', 'BM1684X']
-//     def toolchain_l = ['nntoolchain', 'tpu-mlir']
-//     for (int i=0; i<10; i++) {
-//         def 
-//         getDatabaseConnection(type: 'GLOBAL') {
-//             def results = sql(sql: "INSERT INTO build_table (pipeline_id, commit_sha, case_name, build_status, toolchain, target, build_time, runtime_id, date) VALUES ();")
-//         }
-//     }
-// }
-
 def insert_build_data(data) {
     getDatabaseConnection(type: 'GLOBAL') {
         sql(sql: "INSERT INTO build_table (pipeline_id, commit_sha, case_name, build_status, toolchain, target, build_time, runtime_id, date) VALUES (${data['pipeline_id']}, \"${data['commit_sha']}\", \"${data['case_name']}\", ${data['build_status']}, \"${data['toolchain']}\", \"${data['target']}\", ${data['build_time']}, ${data['runtime_id']}, \"${data['date']}\");")

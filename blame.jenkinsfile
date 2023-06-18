@@ -143,7 +143,7 @@ pipeline {
                         println("--- found latest sucess sha: ${latest_sucess} ---")
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
                             def commit_shas = []
-                            if (latest_sucess.isEmpty()) {
+                            if (latest_sucess == null) {
                                 commit_shas = sh(script: "git log ${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
                             } else {
                                 commit_shas = sh(script: "git log ${latest_sucess}..${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()

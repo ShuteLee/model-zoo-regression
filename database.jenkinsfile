@@ -182,6 +182,7 @@ pipeline {
                                 def runtime_res = gen_dummy_runtime_data(pipeline_id, date)
                                 println("------runtime : ${runtime_res}--------")
                                 def runtime_id = insert_runtime_data(runtime_res)
+                                println("build_id: ${build_id}, runtime_id: ${runtime_id}")
                                 update_runtime_id_in_build(build_id, runtime_id)
                             } else {
                                 println("--------catch failer : ${build_res}----------")

@@ -29,16 +29,16 @@ def sync_repostory(name, url) {
 
 def get_first_avaliable_chips(target) {
     def target_chip_map = ['BM1684': '0x1684', 'BM1684X':'0x1684x']
-    def card_num = sh(script: 'cat /proc/bmsophon/card_num', returnStatus: true)
+    def card_num = sh(script: 'cat /proc/bmsophon/card_num', returnStdout: true)
     println("card_num: ${card_num}")
     for (int i=0; i<card_num; i++) {
-        def chipid = sh(script: "cat /proc/bmsophon/card${i}/chipid", returnStatus: true)
+        def chipid = sh(script: "cat /proc/bmsophon/card${i}/chipid", returnStdout: true)
         println("chipid: ${chipid}")
         if (target_chip_map[target] == chipid) {
-            def avaliable_idxs = sh(script: "ls /proc/bmsophon/card3 | grep \"^bmsophon[0-9]*\$\" | sed 's/bmsophon\\([0-9]*\\)/\\1/'", returnStatus: true).split('\n')
+            def avaliable_idxs = sh(script: "ls /proc/bmsophon/card3 | grep \"^bmsophon[0-9]*\$\" | sed 's/bmsophon\\([0-9]*\\)/\\1/'", returnStdout: true).split('\n')
             println("avaliable_idxs: ${avaliable_idxs}")
             for (def avaliable_idx : avaliable_idxs) {
-                def chip_status = sh(script: "cat /proc/bmsophon/card${i}/bmsophon${avaliable_idx}/status", returnStatus: true)
+                def chip_status = sh(script: "cat /proc/bmsophon/card${i}/bmsophon${avaliable_idx}/status", returnStdout: true)
                 println("avaliable_idx: ${avaliable_idx}, status: ${chip_status}")
                 if (chip_status == "Active") {
                     return avaliable_idx;

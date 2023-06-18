@@ -80,7 +80,7 @@ pipeline {
         }
         stage('Process') {
             steps {
-                dir("$WORKSPACE") {
+                dir("${WORKSPACE}/blame-regression") {
                     script {
                         println("runtime start.....")
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")

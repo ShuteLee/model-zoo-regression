@@ -178,7 +178,7 @@ pipeline {
                                 } finally {
                                     def endTime = new Date().getTime()
                                     def duringTime = endTime - startTime
-                                    def build_res = ['pipeline_id':${BUILD_ID}, 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':0, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
+                                    def build_res = ['pipeline_id':"${BUILD_ID}", 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':0, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
                                     def build_id = insert_build_data(build_res)
                                     update_runtime_id_in_build(build_id, runtime_id)
                                 }

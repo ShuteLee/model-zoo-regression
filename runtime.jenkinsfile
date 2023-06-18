@@ -80,12 +80,12 @@ pipeline {
                     script {
                         println("runtime start.....")
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
-                        // sh """#!/bin/bash
-                        //     set -e
-                        //     python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id 13
-                        // """
                         def device_id = get_first_avaliable_chips(params.TARGET)
-                        println("device_id: ${device_id}")
+                        println("device id selected: ${device_id}")
+                        sh """#!/bin/bash
+                            set -e
+                            python3 -m pytest test -m "mlir and runtime" --target=${params.TARGET} --case_name ${params.CASE_NAME} --device_id ${device_id}
+                        """
                     }
                 }
             }

@@ -86,6 +86,7 @@ pipeline {
                         println("case_name: ${params.CASE_NAME}, TARGET: ${params.TARGET}")
                         def device_id = get_first_avaliable_chips(params.TARGET)
                         println("device id selected: ${device_id}")
+                        def runtime_status = -1
                         try {
                             sh """#!/bin/bash
                                 set -e
@@ -95,10 +96,16 @@ pipeline {
                                 def l2tree = sh(script: "tree -L 3", returnStdout: true).trim()
                                 println("L2 working tree: ${l2tree}")
                             }
+                            runtime_status = 0;
                             // parse_profile("$WORKSPACE")
                             println("runtime sucess")
                         } catch (err) {
                             println("runtime error")
+                        } finally {
+                            println("runtime status: ${runtime_status}")
+                            if (runtime_status == -1) {
+                                throw new Exception("RUNTIME FAILURE")
+                            }
                         }
                     }
                 }

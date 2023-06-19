@@ -37,7 +37,7 @@ def query_latestes_build_sucess(case_name) {
     getDatabaseConnection(type: 'GLOBAL') {
         def results = sql(sql: "SELECT commit_sha FROM build_table WHERE case_name=\"${case_name}\" AND build_status=0 ORDER BY id DESC LIMIT 1;")[0]
         println("query results, latestes_build_sucess: ${results}")
-        return results['commit_sha']
+        return results
     }
 }
 
@@ -146,7 +146,7 @@ pipeline {
                             if (latest_sucess == null) {
                                 commit_shas = sh(script: "git log ${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
                             } else {
-                                commit_shas = sh(script: "git log ${latest_sucess}..${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
+                                commit_shas = sh(script: "git log ${latest_sucess['commit_sha']}..${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
                             }
                             println("Blamming commit_shas: ${commit_shas}")
                             for (def cmt_sha : commit_shas.split("\n")) {

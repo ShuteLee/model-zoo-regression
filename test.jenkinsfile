@@ -1,6 +1,9 @@
 //===-*- Groovy -*-===
 
 pipeline {
+    parameters {
+        string(name: 'JSON_PARAM', defaultValue: '', description: 'json')
+    }
     agent {
         label 'linux-sc5-sc7'
     }
@@ -14,13 +17,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        sh '''#!/bin/bash
-                            set -e
-                            source test.sh
-                            mlir_and_test ppocr BM1684 89hidhgiu
-                        '''
-                        def res = sh(script: "echo \$?", returnStdout: true).trim()
-                        println(res)
+                        println("${params.JSON_PARAM}")
                     }
                 }
             }

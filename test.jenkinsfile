@@ -18,6 +18,8 @@ pipeline {
                 dir("$WORKSPACE") {
                     script {
                         println("params: ${params.JSON_PARAM}")
+                        def params = readJSON text: "${params.JSON_PARAM}"
+                        println(params)
                     }
                 }
             }

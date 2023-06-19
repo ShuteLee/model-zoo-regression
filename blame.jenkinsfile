@@ -168,7 +168,7 @@ pipeline {
                                                 python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME} 2>&1 | tee buildlog_${cmt_sha}.log
                                             """
                                             def buildlog = sh(script: "tail -n 20 buildlog_${cmt_sha}.log", returnStdout: true).trim()
-                                            def uuid = sh(script: "tail -n 2 buildlog_${cmt_sha}.log | grep 'BMODEL_TAR: ' | sed 's/.*BMODEL_TAR: \\(.*\\)/\\1/'", returnStdout: true).trim()
+                                            uuid = sh(script: "tail -n 2 buildlog_${cmt_sha}.log | grep 'BMODEL_TAR: ' | sed 's/.*BMODEL_TAR: \\(.*\\)/\\1/'", returnStdout: true).trim()
                                             // uuid = sh(script: "echo \${BMODEL_TAR}", returnStdout: true).trim()
                                             // uuid = sh(script: '''#!/bin/bash
                                             //             set -e

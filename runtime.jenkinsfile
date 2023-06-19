@@ -4,7 +4,7 @@ def sync_repository_github(name, branch) {
     def url = "https://github.com/sophgo/${name}.git"
     println("sync the latest codes")
     println("repository name: " + name + ", url: " + url)
-    sync_repostory(name, url)
+    sync_repostory(name, url, branch)
 }
 
 def sync_repository_gerrit(name, branch) {

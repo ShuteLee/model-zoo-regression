@@ -1,0 +1,28 @@
+//===-*- Groovy -*-===
+
+pipeline {
+    agent {
+        label 'linux-sc5-sc7'
+    }
+    stages {
+        stage('Information') {
+            steps {
+                println("start profile parsing...")
+            }
+        }
+        stage('Process') {
+            steps {
+                dir("$WORKSPACE") {
+                    script {
+                        sh '''#!/bin/bash
+                            set -e
+                            ./test.sh
+                        '''
+                        def res = sh(script: "echo $?", returnStdout: true).trim()
+                        println(res)
+                    }
+                }
+            }
+        }
+    }
+}

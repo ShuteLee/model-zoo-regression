@@ -1,25 +1,25 @@
 //===-*- Groovy -*-===
 
-def sync_repository_github(name) {
+def sync_repository_github(name, branch) {
     def url = "https://github.com/sophgo/${name}.git"
     println("sync the latest codes")
     println("repository name: " + name + ", url: " + url)
     sync_repostory(name, url)
 }
 
-def sync_repository_gerrit(name) {
+def sync_repository_gerrit(name, branch) {
     def url = "https://${GERRIT_AC_USR}:${GERRIT_AC_PSW}@gerrit-ai.sophgo.vip:8443/a/${name}"
     println("sync the latest codes")
     println("repository name: " + name + ", url: " + url)
-    sync_repostory(name, url)
+    sync_repostory(name, url, branch)
 }
 
-def sync_repostory(name, url) {
+def sync_repostory(name, url, branch) {
     sh """#!/bin/bash
         set -e
         if [ -d "${name}" ]; then
             pushd ${name}
-            git pull && git submodule update
+            git fetch && git reset --hard origin/${branch} && git submodule update
             popd
         else
             git clone ${url}
@@ -92,8 +92,8 @@ pipeline {
         stage('CodeSync') {
             steps {
                 dir("$WORKSPACE") {
-                    sync_repository_github("model-zoo")
-                    sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git")
+                    sync_repository_github("model-zoo", "main")
+                    sync_repostory("blame-regression", "https://github.com/QinyuZHAO0/blame-regression.git", "master")
                 }
             }
         }

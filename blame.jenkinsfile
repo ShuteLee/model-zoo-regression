@@ -155,13 +155,12 @@ pipeline {
                                 def startTime = new Date().getTime()
                                 def build_status = -1
                                 def runtime_id = -1
+                                def uuid = -1
                                 try {
                                     stage("build_${cmt_sha}") {
                                         dir ("${WORKSPACE}/blame-regression") {
-                                            sh """#!/bin/bash
-                                                set -e
-                                                python3 -m pytest test -m "mlir and build" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
-                                            """
+                                            uuid = sh(script: "python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME} | tail -n 1", returnStdout: true).trim()
+                                            println("--- uuid: ${uuid} ---")
                                         }
                                     }
                                     println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")
@@ -169,7 +168,8 @@ pipeline {
                                     // runtiem process
                                     def runtime_job = build job: 'runtime', parameters: [
                                             string(name: 'CASE_NAME', value: params.CASE_NAME),
-                                            string(name: 'TARGET', value: params.TARGET)
+                                            string(name: 'TARGET', value: params.TARGET),
+                                            string(name: 'UUID', value: uuid)
                                             ], wait: true, propagate: false
                                     runtime_id = runtime_job.getId()
                                     println("runtime status: ${runtime_job.getResult()}")

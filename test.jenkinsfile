@@ -17,7 +17,7 @@ pipeline {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        println("${params.JSON_PARAM}")
+                        println("params: ${params.JSON_PARAM}")
                     }
                 }
             }

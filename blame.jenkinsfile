@@ -169,7 +169,7 @@ pipeline {
                                             """
                                             def build_vals = readJSON file: '../model-zoo/build_vals.json'
                                             println("build_vals: ${build_vals}")
-                                            def uuid = build_vals['BMODEL_TAR']
+                                            uuid = build_vals['BMODEL_TAR']
                                             // def buildlog = sh(script: "tail -n 20 buildlog_${cmt_sha}.log", returnStdout: true).trim()
                                             // uuid = sh(script: "tail -n 2 buildlog_${cmt_sha}.log | grep 'BMODEL_TAR: ' | sed 's/.*BMODEL_TAR: \\(.*\\)/\\1/'", returnStdout: true).trim()
                                             // uuid = sh(script: "echo \${BMODEL_TAR}", returnStdout: true).trim()

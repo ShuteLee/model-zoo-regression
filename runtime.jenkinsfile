@@ -84,7 +84,7 @@ pipeline {
                     pip3 install pandas
                     pip3 install docker
                     pip3 install pytest
-                    pip3 install urllib3<2
+                    pip3 install "urllib3<2"
                 """
             }
         }

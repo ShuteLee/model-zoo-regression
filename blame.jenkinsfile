@@ -142,13 +142,17 @@ pipeline {
                         def latest_sucess = query_latestes_build_sucess(params.CASE_NAME)
                         println("--- found latest sucess sha: ${latest_sucess} ---")
                         dir("${WORKSPACE}/${params.TOOLCHAIN}") {
-                            def commit_shas = []
+                            def commit_shas = ""
                             if (latest_sucess == null) {
                                 commit_shas = sh(script: "git log ${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
                             } else {
                                 commit_shas = sh(script: "git log ${latest_sucess['commit_sha']}..${params.COMMIT_SHA} --pretty=oneline -n ${MAX_BLAME_DEPTH} --pretty=format:\"%h\"", returnStdout: true).trim()
                             }
                             println("Blamming commit_shas: ${commit_shas}")
+                            if (commit_shas.isEmpty()) {
+                                println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")
+                                println("+++ This commit sha is alread sucessed in previous regression +++")
+                            }
                             for (def cmt_sha : commit_shas.split("\n")) {
                                 println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_sha}=======================***********************==================")
                                 def date = new Date().format("yyyy-MM-dd")

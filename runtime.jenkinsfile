@@ -72,6 +72,15 @@ pipeline {
         stage('Information') {
             steps {
                 println("RUNTIME: case name: ${params.CASE_NAME}, target selected: ${params.TARGET}")
+                sh """#!/bin/bash
+                    set -e
+                    apt-get update
+                    apt-get install git -y
+                    apt-get install git-lfs -y
+                    apt-get install tree -y
+                    git config --unset core.hooksPath
+                    git lfs install --force
+                """
             }
         }
         stage('CodeSync') {

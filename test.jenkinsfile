@@ -19,7 +19,7 @@ pipeline {
                     script {
                         println("params: ${params.JSON_PARAM}")
                         def param_json = readJSON text: "${params.JSON_PARAM}"
-                        println(param_json['name'])
+                        println(param_json)
                         println(param_json['num'])
                         println(param_json['sites'])
                         println(param_json['sites'][0])

@@ -152,48 +152,49 @@ pipeline {
                             if (commit_shas.isEmpty()) {
                                 println("============================================================================catched sucess, COMMIT_SHA: ${latest_sucess}==========================================================")
                                 println("+++ This commit sha is alread sucessed in previous regression +++")
-                            }
-                            for (def cmt_sha : commit_shas.split("\n")) {
-                                println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_sha}=======================***********************==================")
-                                def date = new Date().format("yyyy-MM-dd")
-                                def startTime = new Date().getTime()
-                                def build_status = -1
-                                def runtime_id = -1
-                                def uuid = -1
-                                try {
-                                    stage("build_${cmt_sha}") {
-                                        dir ("${WORKSPACE}/blame-regression") {
-                                            sh """#!/bin/bash
-                                                set -e
-                                                python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
-                                            """
-                                            def build_vals = readJSON file: '../model-zoo/build_vals.json'
-                                            println("build_vals: ${build_vals}")
-                                            uuid = build_vals['BMODEL_TAR']
-                                            println("--- uuid: ${uuid} ---")
+                            } else {
+                                for (def cmt_sha : commit_shas.split("\n")) {
+                                    println("===================****************************===============================START BUILD, COMMIT_SHA: ${cmt_sha}=======================***********************==================")
+                                    def date = new Date().format("yyyy-MM-dd")
+                                    def startTime = new Date().getTime()
+                                    def build_status = -1
+                                    def runtime_id = -1
+                                    def uuid = -1
+                                    try {
+                                        stage("build_${cmt_sha}") {
+                                            dir ("${WORKSPACE}/blame-regression") {
+                                                sh """#!/bin/bash
+                                                    set -e
+                                                    python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
+                                                """
+                                                def build_vals = readJSON file: '../model-zoo/build_vals.json'
+                                                println("build_vals: ${build_vals}")
+                                                uuid = build_vals['BMODEL_TAR']
+                                                println("--- uuid: ${uuid} ---")
+                                            }
                                         }
+                                        println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")
+                                        build_status = 0
+                                        // runtiem process
+                                        def runtime_job = build job: 'runtime', parameters: [
+                                                string(name: 'CASE_NAME', value: params.CASE_NAME),
+                                                string(name: 'TARGET', value: params.TARGET),
+                                                string(name: 'UUID', value: uuid)
+                                                ], wait: true, propagate: false
+                                        runtime_id = runtime_job.getId()
+                                        println("runtime status: ${runtime_job.getResult()}")
+                                        println("---------------------------------------------------- GOT SUCESS: ${cmt_sha}--------------------------------")
+                                        break;
+                                    } catch (err) {
+                                        println("============================================================================catched failer, COMMIT_SHA: ${cmt_sha}==========================================================")
+                                        println(err)
+                                    } finally {
+                                        def endTime = new Date().getTime()
+                                        def duringTime = endTime - startTime
+                                        def build_res = ['pipeline_id':"${BUILD_ID}", 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':build_status, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
+                                        def build_id = insert_build_data(build_res)
+                                        update_runtime_id_in_build(build_id, runtime_id)
                                     }
-                                    println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")
-                                    build_status = 0
-                                    // runtiem process
-                                    def runtime_job = build job: 'runtime', parameters: [
-                                            string(name: 'CASE_NAME', value: params.CASE_NAME),
-                                            string(name: 'TARGET', value: params.TARGET),
-                                            string(name: 'UUID', value: uuid)
-                                            ], wait: true, propagate: false
-                                    runtime_id = runtime_job.getId()
-                                    println("runtime status: ${runtime_job.getResult()}")
-                                    println("---------------------------------------------------- GOT SUCESS: ${cmt_sha}--------------------------------")
-                                    break;
-                                } catch (err) {
-                                    println("============================================================================catched failer, COMMIT_SHA: ${cmt_sha}==========================================================")
-                                    println(err)
-                                } finally {
-                                    def endTime = new Date().getTime()
-                                    def duringTime = endTime - startTime
-                                    def build_res = ['pipeline_id':"${BUILD_ID}", 'commit_sha':cmt_sha, 'case_name':params.CASE_NAME, 'build_status':build_status, 'toolchain':params.TOOLCHAIN, 'target':params.TARGET, 'build_time':duringTime, 'runtime_id':-1, 'date':date]
-                                    def build_id = insert_build_data(build_res)
-                                    update_runtime_id_in_build(build_id, runtime_id)
                                 }
                             }
                         }

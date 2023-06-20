@@ -150,7 +150,7 @@ pipeline {
                             }
                             println("Blamming commit_shas: ${commit_shas}")
                             if (commit_shas.isEmpty()) {
-                                println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")
+                                println("============================================================================catched sucess, COMMIT_SHA: ${latest_sucess}==========================================================")
                                 println("+++ This commit sha is alread sucessed in previous regression +++")
                             }
                             for (def cmt_sha : commit_shas.split("\n")) {

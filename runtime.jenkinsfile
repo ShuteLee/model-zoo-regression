@@ -60,7 +60,7 @@ pipeline {
         string(name: 'UUID', defaultValue: '', description: 'UUID')
     }
     agent {
-        label 'linux-sc5-sc7'
+        label params.TARGET == "BM1684" ? "linux-sc5" : "linux-sc7"
     }
     environment {
         DEVICES = -1

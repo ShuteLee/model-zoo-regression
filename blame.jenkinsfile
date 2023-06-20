@@ -83,7 +83,7 @@ pipeline {
         string(name: 'COMMIT_SHA', defaultValue: '', description: 'Build the specific version of TPU-MLIR .')
     }
     agent {
-        label 'linux-sc5-sc7'
+        label 'linux-sc5,linux-sc7' 
     }
     environment {
         GIT_REPOSTORY_PATH = "/git-repository"

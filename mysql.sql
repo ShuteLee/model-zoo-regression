@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS `build_table`(
 
 /*
    runtime_status 0: SUCESS 1:FAIL
+   prec: JOSN string
+   model_name + shape + dyn + opt + prec
 */
 CREATE TABLE IF NOT EXISTS `runtime_table`(
    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -37,3 +39,31 @@ CREATE TABLE IF NOT EXISTS `runtime_table`(
    `driver_version` VARCHAR(40),
    `date` DATE
 );
+
+/*
+   file_name: find in model-zoo
+*/
+
+CREATE TABLE `model`(
+   `id` INT,
+   `file_name` VARCHAR(40),
+   `front_framework` VARCHAR(20),
+   `md5` VARCHAR(40),
+   `size` INT
+)
+
+
+CREATE TABLE `case`(
+   `id` INT,
+   `model_zoo_path` VARCHAR(80)
+   `status` 
+)
+
+CREATE TABLE `case_model_map`(
+   
+)
+
+
+CREATE TABLE `case_build`(
+   `case_id`
+)

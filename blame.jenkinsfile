@@ -165,21 +165,12 @@ pipeline {
                                         dir ("${WORKSPACE}/blame-regression") {
                                             sh """#!/bin/bash
                                                 set -e
-                                                python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME} 2>&1 | tee buildlog_${cmt_sha}.log
+                                                python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}
                                             """
                                             def build_vals = readJSON file: '../model-zoo/build_vals.json'
                                             println("build_vals: ${build_vals}")
                                             uuid = build_vals['BMODEL_TAR']
-                                            // def buildlog = sh(script: "tail -n 20 buildlog_${cmt_sha}.log", returnStdout: true).trim()
-                                            // uuid = sh(script: "tail -n 2 buildlog_${cmt_sha}.log | grep 'BMODEL_TAR: ' | sed 's/.*BMODEL_TAR: \\(.*\\)/\\1/'", returnStdout: true).trim()
-                                            // uuid = sh(script: "echo \${BMODEL_TAR}", returnStdout: true).trim()
-                                            // uuid = sh(script: '''#!/bin/bash
-                                            //             set -e
-                                            //             python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME}''', returnStdout: true).trim()
-                                            // uuid = sh(script: "python3 -m pytest test -m \"mlir and build\" --target ${params.TARGET} --commit_id ${cmt_sha} --case_name ${params.CASE_NAME} | grep 'BMODEL_TAR: ' | sed 's/.*BMODEL_TAR: \\(.*\\)/\\1/'", returnStdout: true).trim()
                                             println("--- uuid: ${uuid} ---")
-                                            // def substr = uuid.substring(uuid.indexOf("BMODEL_TAR: ")).split("\n")[0]
-                                            // println("++++++++++++++++++++++++ ${substr} ++++++++++++++++++++++++")
                                         }
                                     }
                                     println("============================================================================catched sucess, COMMIT_SHA: ${cmt_sha}==========================================================")

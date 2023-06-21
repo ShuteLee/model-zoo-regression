@@ -5,7 +5,7 @@ pipeline {
         string(name: 'JSON_PARAM', defaultValue: '', description: 'json')
     }
     agent {
-        label 'linux-sc5-sc7'
+        label any
     }
     stages {
         stage('Information') {

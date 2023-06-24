@@ -94,6 +94,7 @@ pipeline {
         SWAP_SERVER = "http://172.28.142.120/webdav/swap"
         OUTPUT_TMP = "/tmp/dummy.github.output.txt"
         MAX_BLAME_DEPTH = 30
+        CCACHE_REMOTE_STORAGE="redis:172.28.142.24:6379"
     }
     stages {
         stage('Information') {

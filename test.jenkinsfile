@@ -1,6 +1,10 @@
 //===-*- Groovy -*-===
 
 def genParallelStage(it) {
+    println(it["case_name"])
+    println(it["toolchain"])
+    println(it["commit_sha"])
+    println(it["target"])
     return "${it}"
 }
 

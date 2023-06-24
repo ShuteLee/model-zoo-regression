@@ -1,5 +1,9 @@
 //===-*- Groovy -*-===
 
+def genParallelStage(it) {
+    return "${it}"
+}
+
 pipeline {
     parameters {
         string(name: 'JSON_PARAM', defaultValue: '', description: 'json')
@@ -20,10 +24,10 @@ pipeline {
                         println("params: ${params.JSON_PARAM}")
                         def param_json = readJSON text: "${params.JSON_PARAM}"
                         println(param_json)
-                        println(param_json['num'])
-                        println(param_json['cases'])
-                        println(param_json['cases'][0])
-                        println(param_json['cases'][0]['name'])
+                        def stepsForParallel = params.CASE_NAME.split().collectEntries {
+                            ["${it}" : genParallelStage(it)]
+                        }
+                        println()
                     }
                 }
             }

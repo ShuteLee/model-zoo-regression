@@ -22,7 +22,7 @@ pipeline {
                         println("params: ${params.JSON_PARAM}")
                         def param_json = readJSON text: "${params.JSON_PARAM}"
                         println(param_json)
-                        def stepsForParallel = params.CASE_NAME.split().collectEntries {
+                        def stepsForParallel = param_json["cases"].collectEntries {
                             ["${it}" : genParallelStage(it)]
                         }
                         println()

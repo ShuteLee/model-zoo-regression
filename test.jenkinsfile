@@ -25,7 +25,7 @@ pipeline {
                         def stepsForParallel = param_json["cases"].collectEntries {
                             ["${it}" : genParallelStage(it)]
                         }
-                        println()
+                        println(stepsForParallel)
                     }
                 }
             }

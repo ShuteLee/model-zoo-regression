@@ -1,35 +1,18 @@
 //===-*- Groovy -*-===
 
-def genParallelStage(it) {
-    println(it["case_name"])
-    println(it["toolchain"])
-    println(it["commit_sha"])
-    println(it["target"])
-    return "${it}"
-}
-
 pipeline {
     parameters {
         string(name: 'JSON_PARAM', defaultValue: '', description: 'json')
     }
     agent any
     stages {
-        stage('Information') {
-            steps {
-                println("start profile parsing...")
-            }
-        }
         stage('Process') {
             steps {
                 dir("$WORKSPACE") {
                     script {
-                        println("params: ${params.JSON_PARAM}")
+                        println("params string: ${params.JSON_PARAM}")
                         def param_json = readJSON text: "${params.JSON_PARAM}"
-                        println(param_json)
-                        def stepsForParallel = param_json["cases"].collectEntries {
-                            ["${it}" : genParallelStage(it)]
-                        }
-                        println(stepsForParallel)
+                        println("parsed JSON param: ${param_json}")
                     }
                 }
             }

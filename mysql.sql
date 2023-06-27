@@ -16,13 +16,14 @@ CREATE TABLE IF NOT EXISTS `build_table`(
 
 /*
    runtime_status 0: SUCESS 1:FAIL
-   prec: JOSN string
-   model_name + shape + dyn + opt + prec
+   prec: int8/int16/fp32
+   prec_performance: JSON string
 */
 CREATE TABLE IF NOT EXISTS `runtime_table`(
    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `pipeline_id` INT UNSIGNED,
    `build_id` INT,
+   `model_id` INT,
    `runtime_status` INT NOT NULL,
    `target` VARCHAR(20),
    `name` VARCHAR(40),
@@ -35,35 +36,29 @@ CREATE TABLE IF NOT EXISTS `runtime_table`(
    `mac_utiliz` DOUBLE,
    `ddr_utiliz` DOUBLE,
    `cpu_usage` DOUBLE,
+   `prec_performance` TEXT,
    `device_id` INT,
    `driver_version` VARCHAR(40),
    `date` DATE
 );
 
 /*
-   file_name: find in model-zoo
+   file_name: file name in model-zoo
+   case: which modelzoo case belonging to
 */
-
 CREATE TABLE `model`(
-   `id` INT,
+   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `file_name` VARCHAR(40),
+   `case` VARCHAR(40)
    `front_framework` VARCHAR(20),
    `md5` VARCHAR(40),
    `size` INT
 )
 
-
+/*
+   model_zoo_path: case path in model-zoo
+*/
 CREATE TABLE `case`(
-   `id` INT,
+   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `model_zoo_path` VARCHAR(80)
-   `status` 
-)
-
-CREATE TABLE `case_model_map`(
-   
-)
-
-
-CREATE TABLE `case_build`(
-   `case_id`
 )
